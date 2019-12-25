@@ -2,6 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QtSql>
 #include <QSqlDriver>
 #include <QSettings>
@@ -20,16 +26,23 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    QSettings sett;
     QDateTime dateTime;
+
+    QDialog loginPage;
+    QLineEdit *loginEdit;
+    QLineEdit *passwordEdit;
 
 private:
     Ui::MainWindow *ui;
-    //bool createConnection();
+    bool createConnection();
 
 private slots:
 
-    //void readData();
-    //void sendQuery();
+    void cancelButtonClicked();
+    void loginButtonClicked();
+    void readData();
+    void sendQuery();
 
 };
 

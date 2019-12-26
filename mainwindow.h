@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QDialog>
+#include <QWidget>
+#include <QTableView>
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QFormLayout>
@@ -28,8 +30,10 @@ public:
 
     QSettings sett;
     QDateTime dateTime;
+    QSqlDatabase db;
 
     QDialog loginPage;
+    QWidget tableWidget;
     QLineEdit *loginEdit;
     QLineEdit *passwordEdit;
 
@@ -41,9 +45,14 @@ private slots:
 
     void cancelButtonClicked();
     void loginButtonClicked();
-    void readData();
-    void sendQuery();
 
+    void on_patientTable_triggered();
+    void on_medicTable_triggered();
+    void on_diseaseHistoryTable_triggered();
+    void on_OperationTable_triggered();
+    void on_diseaseTypeTable_triggered();
+    void on_medicProfessionTable_triggered();
+    void on_operationTypeTable_triggered();
 };
 
 #endif // MAINWINDOW_H

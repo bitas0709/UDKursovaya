@@ -34,7 +34,7 @@ void MainWindow::loginButtonClicked() {
 }
 
 void MainWindow::cancelButtonClicked() {
-    QApplication::quit();
+    QApplication::quit(); //но это не работает
 }
 
 MainWindow::~MainWindow()
@@ -197,15 +197,16 @@ void MainWindow::on_operationTypeTable_triggered()
 
 void MainWindow::on_addDiseaseHistoryForm_triggered()
 {
-    QFormLayout form(&formWidget);
-    QLineEdit *diseaseHistoryNum = new QLineEdit(&formWidget);
-    QLineEdit *diseaseNum = new QLineEdit(&formWidget);
-    QLineEdit *patientNum = new QLineEdit(&formWidget);
-    QLineEdit *medicNum = new QLineEdit(&formWidget);
-    QLineEdit *dataOfIllness = new QLineEdit(&formWidget);
-    QLineEdit *dataOfRecovery = new QLineEdit(&formWidget);
-    QPushButton *confirmButton = new QPushButton(&formWidget);
-    QPushButton *cancelButton = new QPushButton(&formWidget);
+    formWidget = new QWidget();
+    QFormLayout form(formWidget);
+    QLineEdit *diseaseHistoryNum = new QLineEdit(formWidget);
+    QLineEdit *diseaseNum = new QLineEdit(formWidget);
+    QLineEdit *patientNum = new QLineEdit(formWidget);
+    QLineEdit *medicNum = new QLineEdit(formWidget);
+    QLineEdit *dataOfIllness = new QLineEdit(formWidget);
+    QLineEdit *dataOfRecovery = new QLineEdit(formWidget);
+    QPushButton *confirmButton = new QPushButton(formWidget);
+    QPushButton *cancelButton = new QPushButton(formWidget);
     confirmButton->setText("Добавить");
     cancelButton->setText("Отмена");
     form.addRow(new QLabel("Номер записи:"), diseaseHistoryNum);
@@ -215,5 +216,115 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
     form.addRow(new QLabel("Дата заболевания"), dataOfIllness);
     form.addRow(new QLabel("Дата выздоровления"), dataOfRecovery);
     form.addRow(confirmButton, cancelButton);
-    formWidget.show();
+    formWidget->show();
+}
+
+void MainWindow::on_writePatientOnOperationForm_triggered()
+{
+    formWidget = new QWidget();
+    QFormLayout form(formWidget);
+    QLineEdit *operationNum = new QLineEdit(formWidget);
+    QLineEdit *operationTypeNum = new QLineEdit(formWidget);
+    QLineEdit *diseaseHistoryNum = new QLineEdit(formWidget);
+    QLineEdit *operationDate = new QLineEdit(formWidget);
+    QPushButton *confirmButton = new QPushButton(formWidget);
+    QPushButton *cancelButton = new QPushButton(formWidget);
+    confirmButton->setText("Добавить");
+    cancelButton->setText("Отмена");
+    form.addRow(new QLabel("Номер записи:"), operationNum);
+    form.addRow(new QLabel("Номер типа операции:"), operationTypeNum);
+    form.addRow(new QLabel("Номер записи в истории болезней:"), diseaseHistoryNum);
+    form.addRow(new QLabel("Дата проведения операции:"), operationDate);
+    form.addRow(confirmButton, cancelButton);
+    formWidget->show();
+}
+
+void MainWindow::on_watchPatientDiseaseHistoryForm_triggered()
+{
+    QDialog *enterPatientNumDialog = new QDialog();
+    QFormLayout dialogForm(enterPatientNumDialog);
+    QLineEdit *patientNum = new QLineEdit(enterPatientNumDialog);
+    QPushButton *confirmButton = new QPushButton(enterPatientNumDialog);
+    confirmButton->setText("Подтвердить:");
+    dialogForm.addRow(new QLabel("Номер пациента:"), patientNum);
+    dialogForm.addRow(confirmButton);
+    enterPatientNumDialog->show();
+}
+
+void MainWindow::on_addPatientForm_triggered()
+{
+    formWidget = new QWidget();
+    QFormLayout form(formWidget);
+    patientNum = new QLineEdit(formWidget);
+    lastName = new QLineEdit(formWidget);
+    firstName = new QLineEdit(formWidget);
+    fatherName = new QLineEdit(formWidget);
+    sex = new QLineEdit(formWidget);
+    birthDate = new QLineEdit(formWidget);
+    address = new QLineEdit(formWidget);
+    medPolisNum = new QLineEdit(formWidget);
+    passportNum = new QLineEdit(formWidget);
+    mobileNum = new QLineEdit(formWidget);
+    QPushButton *confirmButton = new QPushButton(formWidget);
+    connect(confirmButton, SIGNAL(clicked()), SLOT(addPatientFormConfirmButtonClicked()));
+    QPushButton *cancelButton = new QPushButton(formWidget);
+    confirmButton->setText("Добавить");
+    cancelButton->setText("Отмена");
+    form.addRow(new QLabel("Номер пациента:"), patientNum);
+    form.addRow(new QLabel("Фамилия:"), lastName);
+    form.addRow(new QLabel("Имя:"), firstName);
+    form.addRow(new QLabel("Отчество:"), fatherName);
+    form.addRow(new QLabel("Пол:"), sex);
+    form.addRow(new QLabel("Дата рождения:"), birthDate);
+    form.addRow(new QLabel("Адрес:"), address);
+    form.addRow(new QLabel("Номер мед. полиса:"), medPolisNum);
+    form.addRow(new QLabel("Серия и номер паспорта:"), passportNum);
+    form.addRow(new QLabel("Номер телефона:"), mobileNum);
+    form.addRow(confirmButton, cancelButton);
+    formWidget->show();
+}
+
+void MainWindow::addPatientFormConfirmButtonClicked() {
+    if (!patientNum->text().isEmpty() &&
+            !lastName->text().isEmpty() &&
+            !firstName->text().isEmpty() &&
+            !fatherName->text().isEmpty() &&
+            !sex->text().isEmpty() &&
+            !birthDate->text().isEmpty() &&
+            !address->text().isEmpty() &&
+            !medPolisNum->text().isEmpty() &&
+            !passportNum->text().isEmpty()) {
+        QSqlQuery query;
+        query.prepare("INSERT INTO Patient (PatientNum, LastName, FirstName, FatherName, Sex, BirthDate, Address, MedPolisNum, PassportNum, MobileNum) "
+                      "VALUES (:patientNum, :lastName, :firstName, :fatherName, :sex, :birthDate, :address, :medPolisNum, :passportNum, :mobileNum)");
+        query.bindValue(":patientNum", patientNum->text().toInt());
+        query.bindValue(":lastName", lastName->text());
+        query.bindValue(":firstName", firstName->text());
+        query.bindValue(":fatherName", fatherName->text());
+        query.bindValue(":sex", sex->text());
+        query.bindValue(":birthDate", QDate::fromString(birthDate->text(), "dd/MM/yyyy"));
+        query.bindValue(":address", address->text());
+        query.bindValue(":medPolisNum", medPolisNum->text());
+        query.bindValue(":passportNum", passportNum->text());
+        query.bindValue(":mobileNum", mobileNum->text());
+        if (query.exec()) {
+            formWidget->close();
+        } else {
+            qDebug() << "hmhmhmhmhm" << query.lastError();
+        }
+    } else {
+        qDebug() << "Заполнены не все поля!";
+    }
+}
+
+void MainWindow::addDiseaseHistoryFormConfirmButtonClicked() {
+
+}
+
+void MainWindow::writePatientOnOperationFormConfirmButtonClicked() {
+
+}
+
+void MainWindow::watchPatientDiseaseHistoryFormConfirmButtonClicked() {
+
 }

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QDialog>
 #include <QWidget>
+#include <QDate>
 #include <QTableView>
 #include <QDialogButtonBox>
 #include <QPushButton>
@@ -32,10 +33,21 @@ public:
     QDateTime dateTime;
     QSqlDatabase db;
 
+    QWidget *formWidget;
     QDialog loginPage;
-    QWidget formWidget;
     QLineEdit *loginEdit;
     QLineEdit *passwordEdit;
+
+    QLineEdit *patientNum;
+    QLineEdit *lastName;
+    QLineEdit *firstName;
+    QLineEdit *fatherName;
+    QLineEdit *sex;
+    QLineEdit *birthDate;
+    QLineEdit *address;
+    QLineEdit *medPolisNum;
+    QLineEdit *passportNum;
+    QLineEdit *mobileNum;
 
 private:
     Ui::MainWindow *ui;
@@ -46,6 +58,11 @@ private slots:
     void cancelButtonClicked();
     void loginButtonClicked();
 
+    void addDiseaseHistoryFormConfirmButtonClicked();
+    void writePatientOnOperationFormConfirmButtonClicked();
+    void watchPatientDiseaseHistoryFormConfirmButtonClicked();
+    void addPatientFormConfirmButtonClicked();
+
     void on_patientTable_triggered();
     void on_medicTable_triggered();
     void on_diseaseHistoryTable_triggered();
@@ -54,6 +71,9 @@ private slots:
     void on_medicProfessionTable_triggered();
     void on_operationTypeTable_triggered();
     void on_addDiseaseHistoryForm_triggered();
+    void on_writePatientOnOperationForm_triggered();
+    void on_watchPatientDiseaseHistoryForm_triggered();
+    void on_addPatientForm_triggered();
 };
 
 #endif // MAINWINDOW_H

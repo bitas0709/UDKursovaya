@@ -33,7 +33,7 @@ public:
     QSqlDatabase db;
 
     QDialog loginPage;
-    QWidget tableWidget;
+    QWidget formWidget;
     QLineEdit *loginEdit;
     QLineEdit *passwordEdit;
 
@@ -53,6 +53,7 @@ private slots:
     void on_diseaseTypeTable_triggered();
     void on_medicProfessionTable_triggered();
     void on_operationTypeTable_triggered();
+    void on_addDiseaseHistoryForm_triggered();
 };
 
 #endif // MAINWINDOW_H

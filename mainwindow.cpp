@@ -194,3 +194,26 @@ void MainWindow::on_operationTypeTable_triggered()
     qDebug() << view->size();
     view->show();
 }
+
+void MainWindow::on_addDiseaseHistoryForm_triggered()
+{
+    QFormLayout form(&formWidget);
+    QLineEdit *diseaseHistoryNum = new QLineEdit(&formWidget);
+    QLineEdit *diseaseNum = new QLineEdit(&formWidget);
+    QLineEdit *patientNum = new QLineEdit(&formWidget);
+    QLineEdit *medicNum = new QLineEdit(&formWidget);
+    QLineEdit *dataOfIllness = new QLineEdit(&formWidget);
+    QLineEdit *dataOfRecovery = new QLineEdit(&formWidget);
+    QPushButton *confirmButton = new QPushButton(&formWidget);
+    QPushButton *cancelButton = new QPushButton(&formWidget);
+    confirmButton->setText("Добавить");
+    cancelButton->setText("Отмена");
+    form.addRow(new QLabel("Номер записи:"), diseaseHistoryNum);
+    form.addRow(new QLabel("Номер типа болезни"), diseaseNum);
+    form.addRow(new QLabel("Номер пациента"), patientNum);
+    form.addRow(new QLabel("Номер медика:"), medicNum);
+    form.addRow(new QLabel("Дата заболевания"), dataOfIllness);
+    form.addRow(new QLabel("Дата выздоровления"), dataOfRecovery);
+    form.addRow(confirmButton, cancelButton);
+    formWidget.show();
+}

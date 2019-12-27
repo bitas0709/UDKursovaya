@@ -49,6 +49,16 @@ public:
     QLineEdit *passportNum;
     QLineEdit *mobileNum;
 
+    QLineEdit *diseaseHistoryNum;
+    QLineEdit *diseaseNum;
+    QLineEdit *medicNum;
+    QLineEdit *dataOfIllness;
+    QLineEdit *dataOfRecovery;
+
+    QLineEdit *operationNum;
+    QLineEdit *operationTypeNum;
+    QLineEdit *operationDate;
+
 private:
     Ui::MainWindow *ui;
     bool createConnection();

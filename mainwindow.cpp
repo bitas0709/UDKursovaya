@@ -199,13 +199,14 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
 {
     formWidget = new QWidget();
     QFormLayout form(formWidget);
-    QLineEdit *diseaseHistoryNum = new QLineEdit(formWidget);
-    QLineEdit *diseaseNum = new QLineEdit(formWidget);
-    QLineEdit *patientNum = new QLineEdit(formWidget);
-    QLineEdit *medicNum = new QLineEdit(formWidget);
-    QLineEdit *dataOfIllness = new QLineEdit(formWidget);
-    QLineEdit *dataOfRecovery = new QLineEdit(formWidget);
+    diseaseHistoryNum = new QLineEdit(formWidget);
+    diseaseNum = new QLineEdit(formWidget);
+    patientNum = new QLineEdit(formWidget);
+    medicNum = new QLineEdit(formWidget);
+    dataOfIllness = new QLineEdit(formWidget);
+    dataOfRecovery = new QLineEdit(formWidget);
     QPushButton *confirmButton = new QPushButton(formWidget);
+    connect(confirmButton, SIGNAL(clicked()), SLOT(addDiseaseHistoryFormConfirmButtonClicked()));
     QPushButton *cancelButton = new QPushButton(formWidget);
     confirmButton->setText("Добавить");
     cancelButton->setText("Отмена");
@@ -223,10 +224,10 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
 {
     formWidget = new QWidget();
     QFormLayout form(formWidget);
-    QLineEdit *operationNum = new QLineEdit(formWidget);
-    QLineEdit *operationTypeNum = new QLineEdit(formWidget);
-    QLineEdit *diseaseHistoryNum = new QLineEdit(formWidget);
-    QLineEdit *operationDate = new QLineEdit(formWidget);
+    operationNum = new QLineEdit(formWidget);
+    operationTypeNum = new QLineEdit(formWidget);
+    diseaseHistoryNum = new QLineEdit(formWidget);
+    operationDate = new QLineEdit(formWidget);
     QPushButton *confirmButton = new QPushButton(formWidget);
     QPushButton *cancelButton = new QPushButton(formWidget);
     confirmButton->setText("Добавить");
@@ -302,7 +303,7 @@ void MainWindow::addPatientFormConfirmButtonClicked() {
         query.bindValue(":firstName", firstName->text());
         query.bindValue(":fatherName", fatherName->text());
         query.bindValue(":sex", sex->text());
-        query.bindValue(":birthDate", QDate::fromString(birthDate->text(), "dd/MM/yyyy"));
+        query.bindValue(":birthDate", QDate::fromString(birthDate->text(), "dd.MM.yyyy"));
         query.bindValue(":address", address->text());
         query.bindValue(":medPolisNum", medPolisNum->text());
         query.bindValue(":passportNum", passportNum->text());
@@ -318,7 +319,35 @@ void MainWindow::addPatientFormConfirmButtonClicked() {
 }
 
 void MainWindow::addDiseaseHistoryFormConfirmButtonClicked() {
-
+//    diseaseHistoryNum = new QLineEdit(formWidget);
+//    diseaseNum = new QLineEdit(formWidget);
+//    patientNum = new QLineEdit(formWidget);
+//    medicNum = new QLineEdit(formWidget);
+//    dataOfIllness = new QLineEdit(formWidget);
+//    dataOfRecovery = new QLineEdit(formWidget);
+    if (!diseaseHistoryNum->text().isEmpty() &&
+            !diseaseNum->text().isEmpty() &&
+            !patientNum->text().isEmpty() &&
+            !medicNum->text().isEmpty() &&
+            !dataOfIllness->text().isEmpty() &&
+            !dataOfRecovery->text().isEmpty()) {
+        QSqlQuery query;
+        query.prepare("INSERT INTO DiseaseHistory (DiseaseHistoryNum, DiseaseNum, PatientNum, MedicNum, DateOfIllness, DateOfRecovery) "
+                      "VALUES ( :diseaseHistoryNum, :diseaseNum, :patientNum, :medicNum, :dataOfIllness, :dataOfRecovery )");
+        query.bindValue(":diseaseHistoryNum", diseaseHistoryNum->text().toInt());
+        query.bindValue(":diseaseNum", diseaseNum->text().toInt());
+        query.bindValue(":patientNum", patientNum->text().toInt());
+        query.bindValue(":medicNum", medicNum->text().toInt());
+        query.bindValue(":dataOfIllness", QDate::fromString(dataOfIllness->text(), "dd.MM.yyyy"));
+        query.bindValue(":dataOfRecovery", QDate::fromString(dataOfRecovery->text(), "dd.MM.yyyy"));
+        if (query.exec()) {
+            formWidget->close();
+        } else {
+            qDebug() << "Insert error" << query.lastError();
+        }
+    } else {
+        qDebug() << "Заполнены не все поля!";
+    }
 }
 
 void MainWindow::writePatientOnOperationFormConfirmButtonClicked() {

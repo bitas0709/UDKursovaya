@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <QWidget>
 #include <QDate>
+#include <QTime>
 #include <QTableView>
 #include <QDialogButtonBox>
 #include <QPushButton>
@@ -35,6 +36,9 @@ public:
 
     QWidget *formWidget;
     QDialog loginPage;
+
+    QLineEdit *medicNum;
+
     QLineEdit *loginEdit;
     QLineEdit *passwordEdit;
 
@@ -49,15 +53,25 @@ public:
     QLineEdit *passportNum;
     QLineEdit *mobileNum;
 
+    //История Болезней
     QLineEdit *diseaseHistoryNum;
     QLineEdit *diseaseNum;
-    QLineEdit *medicNum;
     QLineEdit *dataOfIllness;
     QLineEdit *dataOfRecovery;
 
+    //Операции
     QLineEdit *operationNum;
     QLineEdit *operationTypeNum;
     QLineEdit *operationDate;
+    QLineEdit *operationStartTime;
+
+    //Посещение
+    QLineEdit *visitNum;
+    QLineEdit *visitDate;
+    QLineEdit *visitTime;
+    QLineEdit *visitReport;
+    QLineEdit *visitResult;
+    QLineEdit *visitPrice;
 
 private:
     Ui::MainWindow *ui;
@@ -70,8 +84,8 @@ private slots:
 
     void addDiseaseHistoryFormConfirmButtonClicked();
     void writePatientOnOperationFormConfirmButtonClicked();
-    void watchPatientDiseaseHistoryFormConfirmButtonClicked();
     void addPatientFormConfirmButtonClicked();
+    void addPatientToVisitConfirmButtonClicked();
 
     void on_patientTable_triggered();
     void on_medicTable_triggered();
@@ -82,8 +96,10 @@ private slots:
     void on_operationTypeTable_triggered();
     void on_addDiseaseHistoryForm_triggered();
     void on_writePatientOnOperationForm_triggered();
-    void on_watchPatientDiseaseHistoryForm_triggered();
     void on_addPatientForm_triggered();
+    void on_VisitTable_triggered();
+    void on_addPatientToVisit_triggered();
+    void on_MedicCard_triggered();
 };
 
 #endif // MAINWINDOW_H

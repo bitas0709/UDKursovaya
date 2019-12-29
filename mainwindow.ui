@@ -31,6 +31,7 @@
     <addaction name="patientTable"/>
     <addaction name="diseaseHistoryTable"/>
     <addaction name="OperationTable"/>
+    <addaction name="VisitTable"/>
     <addaction name="separator"/>
     <addaction name="diseaseTypeTable"/>
     <addaction name="medicProfessionTable"/>
@@ -41,9 +42,9 @@
      <string>Запросы</string>
     </property>
     <addaction name="query1"/>
-    <addaction name="query2"/>
+    <addaction name="watchPatientDiseaseHistory"/>
     <addaction name="query3"/>
-    <addaction name="query4"/>
+    <addaction name="MedicCard"/>
     <addaction name="query5"/>
     <addaction name="query6"/>
     <addaction name="query7"/>
@@ -54,10 +55,10 @@
     <property name="title">
      <string>Формы</string>
     </property>
+    <addaction name="addPatientForm"/>
+    <addaction name="addPatientToVisit"/>
     <addaction name="addDiseaseHistoryForm"/>
     <addaction name="writePatientOnOperationForm"/>
-    <addaction name="watchPatientDiseaseHistoryForm"/>
-    <addaction name="addPatientForm"/>
    </widget>
    <widget class="QMenu" name="menu_4">
     <property name="title">
@@ -114,27 +115,27 @@
   </action>
   <action name="query1">
    <property name="text">
-    <string>Запрос №1</string>
+    <string>Занятость врача</string>
    </property>
   </action>
-  <action name="query2">
+  <action name="watchPatientDiseaseHistory">
    <property name="text">
-    <string>Запрос №2</string>
+    <string>История болезней бациента</string>
    </property>
   </action>
   <action name="query3">
    <property name="text">
-    <string>Запрос №3</string>
+    <string>Операции в этом месяце</string>
    </property>
   </action>
-  <action name="query4">
+  <action name="MedicCard">
    <property name="text">
-    <string>Запрос №4</string>
+    <string>Карточка врача</string>
    </property>
   </action>
   <action name="query5">
    <property name="text">
-    <string>Запрос №5</string>
+    <string>Просмотр всех операций</string>
    </property>
   </action>
   <action name="query6">
@@ -185,6 +186,16 @@
   <action name="AboutProgram">
    <property name="text">
     <string>О программе</string>
+   </property>
+  </action>
+  <action name="VisitTable">
+   <property name="text">
+    <string>Посещения</string>
+   </property>
+  </action>
+  <action name="addPatientToVisit">
+   <property name="text">
+    <string>Записать пациента на приём</string>
    </property>
   </action>
  </widget>

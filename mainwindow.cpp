@@ -60,10 +60,10 @@ bool MainWindow::createConnection() {
 void MainWindow::on_patientTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM Patient");
+    query.prepare("SELECT * FROM Пациенты");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("Patient");
+    model->setTable("Пациенты");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Фамилия"));
@@ -75,7 +75,6 @@ void MainWindow::on_patientTable_triggered()
     model->setHeaderData(7, Qt::Horizontal, tr("Номер мед. полиса"));
     model->setHeaderData(8, Qt::Horizontal, tr("Серия и номер паспорта"));
     model->setHeaderData(9, Qt::Horizontal, tr("Номер телефона"));
-    //sendQuery(query, QString("Table"), model);
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -85,10 +84,10 @@ void MainWindow::on_patientTable_triggered()
 void MainWindow::on_medicTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM Medic");
+    query.prepare("SELECT * FROM Врачи");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("Medic");
+    model->setTable("Врачи");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Фамилия"));
@@ -97,7 +96,6 @@ void MainWindow::on_medicTable_triggered()
     model->setHeaderData(4, Qt::Horizontal, tr("Дата найма"));
     model->setHeaderData(5, Qt::Horizontal, tr("ID профессии"));
     model->setHeaderData(6, Qt::Horizontal, tr("Номер телефона"));
-    //sendQuery(query, QString("Table"), model);
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -107,18 +105,16 @@ void MainWindow::on_medicTable_triggered()
 void MainWindow::on_diseaseHistoryTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM DiseaseHistory");
+    query.prepare("SELECT * FROM ИсторияБолезни");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("DiseaseHistory");
+    model->setTable("ИсторияБолезни");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Horizontal, tr("ID болезни"));
-    model->setHeaderData(2, Qt::Horizontal, tr("ID пациента"));
-    model->setHeaderData(3, Qt::Horizontal, tr("ID врача"));
+    model->setHeaderData(1, Qt::Horizontal, tr("ID посещения"));
+    model->setHeaderData(2, Qt::Horizontal, tr("ID заболевания"));
     model->setHeaderData(4, Qt::Horizontal, tr("Дата заболевания"));
     model->setHeaderData(5, Qt::Horizontal, tr("Дата выздоровления"));
-    //sendQuery(query, QString("Table"), model);
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -128,16 +124,16 @@ void MainWindow::on_diseaseHistoryTable_triggered()
 void MainWindow::on_OperationTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM Operation");
+    query.prepare("SELECT * FROM Операции");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("Operation");
+    model->setTable("Операции");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("ID операции"));
     model->setHeaderData(2, Qt::Horizontal, tr("ID номера истории болезни"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Дата операции"));
-    //sendQuery(query, QString("Table"), model);
+    model->setHeaderData(3, Qt::Horizontal, tr("Дата проведения операции"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Время начала операции"));
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -147,14 +143,13 @@ void MainWindow::on_OperationTable_triggered()
 void MainWindow::on_diseaseTypeTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM DiseaseType");
+    query.prepare("SELECT * FROM ТипЗаболевания");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("DiseaseType");
+    model->setTable("ТипЗаболевания");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Название заболевания"));
-    //sendQuery(query, QString("Table"), model);
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -164,14 +159,13 @@ void MainWindow::on_diseaseTypeTable_triggered()
 void MainWindow::on_medicProfessionTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM MedicProfession");
+    query.prepare("SELECT * FROM ПрофессииВрача");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("MedicProfession");
+    model->setTable("ПрофессииВрача");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Название профессии"));
-    //sendQuery(query, QString("Table"), model);
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -181,14 +175,35 @@ void MainWindow::on_medicProfessionTable_triggered()
 void MainWindow::on_operationTypeTable_triggered()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM OperationType");
+    query.prepare("SELECT * FROM ТипОперации");
     query.exec();
     QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("OperationType");
+    model->setTable("ТипОперации");
     model->select();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Название операции"));
-    //sendQuery(query, QString("Table"), model);
+    QTableView *view = new QTableView;
+    view->setModel(model);
+    qDebug() << view->size();
+    view->show();
+}
+
+void MainWindow::on_VisitTable_triggered()
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM Посещение");
+    query.exec();
+    QSqlTableModel *model = new QSqlTableModel(this, db);
+    model->setTable("Посещение");
+    model->select();
+    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, tr("ID Пациента"));
+    model->setHeaderData(2, Qt::Horizontal, tr("ID Врача"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Дата посещения"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Время посещения"));
+    model->setHeaderData(5, Qt::Horizontal, tr("Жалоба"));
+    model->setHeaderData(6, Qt::Horizontal, tr("Результат обследования"));
+    model->setHeaderData(7, Qt::Horizontal, tr("Цена"));
     QTableView *view = new QTableView;
     view->setModel(model);
     qDebug() << view->size();
@@ -200,9 +215,8 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
     formWidget = new QWidget();
     QFormLayout form(formWidget);
     diseaseHistoryNum = new QLineEdit(formWidget);
+    visitNum = new QLineEdit(formWidget);
     diseaseNum = new QLineEdit(formWidget);
-    patientNum = new QLineEdit(formWidget);
-    medicNum = new QLineEdit(formWidget);
     dataOfIllness = new QLineEdit(formWidget);
     dataOfRecovery = new QLineEdit(formWidget);
     QPushButton *confirmButton = new QPushButton(formWidget);
@@ -211,13 +225,36 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
     confirmButton->setText("Добавить");
     cancelButton->setText("Отмена");
     form.addRow(new QLabel("Номер записи:"), diseaseHistoryNum);
+    form.addRow(new QLabel("Номер посещения"), visitNum);
     form.addRow(new QLabel("Номер типа болезни"), diseaseNum);
-    form.addRow(new QLabel("Номер пациента"), patientNum);
-    form.addRow(new QLabel("Номер медика:"), medicNum);
     form.addRow(new QLabel("Дата заболевания"), dataOfIllness);
     form.addRow(new QLabel("Дата выздоровления"), dataOfRecovery);
     form.addRow(confirmButton, cancelButton);
     formWidget->show();
+}
+
+void MainWindow::addDiseaseHistoryFormConfirmButtonClicked() {
+    if (!diseaseHistoryNum->text().isEmpty() &&
+            !visitNum->text().isEmpty() &&
+            !diseaseNum->text().isEmpty() &&
+            !dataOfIllness->text().isEmpty() &&
+            !dataOfRecovery->text().isEmpty()) {
+        QSqlQuery query;
+        query.prepare("INSERT INTO ИсторияБолезни (НомерЗаписи, НомерПосещения, НомерЗаболевания, ДатаЗаболевания, ДатаВыздоровления) "
+                      "VALUES ( :diseaseHistoryNum, :visitNum, :diseaseNum, :dataOfIllness, :dataOfRecovery )");
+        query.bindValue(":diseaseHistoryNum", diseaseHistoryNum->text().toInt());
+        query.bindValue(":visitNum", visitNum->text().toInt());
+        query.bindValue(":diseaseNum", diseaseNum->text().toInt());
+        query.bindValue(":dataOfIllness", QDate::fromString(dataOfIllness->text(), "dd.MM.yyyy"));
+        query.bindValue(":dataOfRecovery", QDate::fromString(dataOfRecovery->text(), "dd.MM.yyyy"));
+        if (query.exec()) {
+            formWidget->close();
+        } else {
+            qDebug() << "Insert error" << query.lastError();
+        }
+    } else {
+        qDebug() << "Заполнены не все поля!";
+    }
 }
 
 void MainWindow::on_writePatientOnOperationForm_triggered()
@@ -228,7 +265,9 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
     operationTypeNum = new QLineEdit(formWidget);
     diseaseHistoryNum = new QLineEdit(formWidget);
     operationDate = new QLineEdit(formWidget);
+    operationStartTime = new QLineEdit(formWidget);
     QPushButton *confirmButton = new QPushButton(formWidget);
+    connect(confirmButton, SIGNAL(clicked()), SLOT(writePatientOnOperationFormConfirmButtonClicked()));
     QPushButton *cancelButton = new QPushButton(formWidget);
     confirmButton->setText("Добавить");
     cancelButton->setText("Отмена");
@@ -236,20 +275,33 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
     form.addRow(new QLabel("Номер типа операции:"), operationTypeNum);
     form.addRow(new QLabel("Номер записи в истории болезней:"), diseaseHistoryNum);
     form.addRow(new QLabel("Дата проведения операции:"), operationDate);
+    form.addRow(new QLabel("Время начала операции:"), operationStartTime);
     form.addRow(confirmButton, cancelButton);
     formWidget->show();
 }
 
-void MainWindow::on_watchPatientDiseaseHistoryForm_triggered()
-{
-    QDialog *enterPatientNumDialog = new QDialog();
-    QFormLayout dialogForm(enterPatientNumDialog);
-    QLineEdit *patientNum = new QLineEdit(enterPatientNumDialog);
-    QPushButton *confirmButton = new QPushButton(enterPatientNumDialog);
-    confirmButton->setText("Подтвердить:");
-    dialogForm.addRow(new QLabel("Номер пациента:"), patientNum);
-    dialogForm.addRow(confirmButton);
-    enterPatientNumDialog->show();
+void MainWindow::writePatientOnOperationFormConfirmButtonClicked() {
+    if (!operationNum->text().isEmpty() &&
+            !operationTypeNum->text().isEmpty() &&
+            !diseaseHistoryNum->text().isEmpty() &&
+            !operationDate->text().isEmpty() &&
+            !operationStartTime->text().isEmpty()) {
+        QSqlQuery query;
+        query.prepare("INSERT INTO Операции (НомерОперации, НомерТипаОперации, НомерИсторииБолезни, ДатаПроведенияОперации, ВремяНачалаОперации) "
+                      "VALUES (:operationNum, :operationTypeNum, :diseaseHistoryNum, :operationDate, :operationStartTime)");
+        query.bindValue(":operationNum", operationNum->text().toInt());
+        query.bindValue(":operationTypeNum", operationTypeNum->text().toInt());
+        query.bindValue(":diseaseHistoryNum", diseaseHistoryNum->text().toInt());
+        query.bindValue(":operationDate", QDate::fromString(operationDate->text(), "dd.MM.yyyy"));
+        query.bindValue(":operationStartTime", QTime::fromString(operationStartTime->text(), "hh.mm.ss"));
+        if (query.exec()) {
+            formWidget->close();
+        } else {
+            qDebug() << "hmhmhmhmhm" << query.lastError();
+        }
+    } else {
+        qDebug() << "Заполнены не все поля!";
+    }
 }
 
 void MainWindow::on_addPatientForm_triggered()
@@ -296,7 +348,7 @@ void MainWindow::addPatientFormConfirmButtonClicked() {
             !medPolisNum->text().isEmpty() &&
             !passportNum->text().isEmpty()) {
         QSqlQuery query;
-        query.prepare("INSERT INTO Patient (PatientNum, LastName, FirstName, FatherName, Sex, BirthDate, Address, MedPolisNum, PassportNum, MobileNum) "
+        query.prepare("INSERT INTO Пациенты (НомерПациента, Фамилия, Имя, Отчество, Пол, ДатаРождения, Адрес, НомерМедПолиса, НомерПаспорта, НомерТелефона) "
                       "VALUES (:patientNum, :lastName, :firstName, :fatherName, :sex, :birthDate, :address, :medPolisNum, :passportNum, :mobileNum)");
         query.bindValue(":patientNum", patientNum->text().toInt());
         query.bindValue(":lastName", lastName->text());
@@ -318,28 +370,55 @@ void MainWindow::addPatientFormConfirmButtonClicked() {
     }
 }
 
-void MainWindow::addDiseaseHistoryFormConfirmButtonClicked() {
-//    diseaseHistoryNum = new QLineEdit(formWidget);
-//    diseaseNum = new QLineEdit(formWidget);
-//    patientNum = new QLineEdit(formWidget);
-//    medicNum = new QLineEdit(formWidget);
-//    dataOfIllness = new QLineEdit(formWidget);
-//    dataOfRecovery = new QLineEdit(formWidget);
-    if (!diseaseHistoryNum->text().isEmpty() &&
-            !diseaseNum->text().isEmpty() &&
+void MainWindow::on_addPatientToVisit_triggered()
+{
+    formWidget = new QWidget();
+    QFormLayout form(formWidget);
+    visitNum = new QLineEdit(formWidget);
+    patientNum = new QLineEdit(formWidget);
+    medicNum = new QLineEdit(formWidget);
+    visitDate = new QLineEdit(formWidget);
+    visitTime = new QLineEdit(formWidget);
+    visitReport = new QLineEdit(formWidget);
+    visitResult = new QLineEdit(formWidget);
+    visitPrice = new QLineEdit(formWidget);
+    QPushButton *confirmButton = new QPushButton(formWidget);
+    connect(confirmButton, SIGNAL(clicked()), SLOT(addPatientToVisitConfirmButtonClicked()));
+    QPushButton *cancelButton = new QPushButton(formWidget);
+    confirmButton->setText("Добавить");
+    cancelButton->setText("Отмена");
+    form.addRow(new QLabel("Номер посещения:"), visitNum);
+    form.addRow(new QLabel("Номер пациента:"), patientNum);
+    form.addRow(new QLabel("Номер врача:"), medicNum);
+    form.addRow(new QLabel("Дата посещения:"), visitDate);
+    form.addRow(new QLabel("Время посещения:"), visitTime);
+    form.addRow(new QLabel("Жалоба:"), visitReport);
+    form.addRow(new QLabel("Результат обследования:"), visitResult);
+    form.addRow(new QLabel("Цена:"), visitPrice);
+    form.addRow(confirmButton, cancelButton);
+    formWidget->show();
+}
+
+void MainWindow::addPatientToVisitConfirmButtonClicked() {
+    if (!visitNum->text().isEmpty() &&
             !patientNum->text().isEmpty() &&
             !medicNum->text().isEmpty() &&
-            !dataOfIllness->text().isEmpty() &&
-            !dataOfRecovery->text().isEmpty()) {
+            !visitDate->text().isEmpty() &&
+            !visitTime->text().isEmpty() &&
+            !visitReport->text().isEmpty() &&
+            !visitResult->text().isEmpty() &&
+            !visitPrice->text().isEmpty()) {
         QSqlQuery query;
-        query.prepare("INSERT INTO DiseaseHistory (DiseaseHistoryNum, DiseaseNum, PatientNum, MedicNum, DateOfIllness, DateOfRecovery) "
-                      "VALUES ( :diseaseHistoryNum, :diseaseNum, :patientNum, :medicNum, :dataOfIllness, :dataOfRecovery )");
-        query.bindValue(":diseaseHistoryNum", diseaseHistoryNum->text().toInt());
-        query.bindValue(":diseaseNum", diseaseNum->text().toInt());
+        query.prepare("INSERT INTO Посещение (НомерПосещения, НомерПациента, НомерВрача, ДатаПосещения, ВремяПосещения, Жалоба, РезультатОбследования, Цена) "
+                      "VALUES ( :visitNum, :patientNum, :medicNum, :visitDate, :visitTime, :visitReport, :visitResult, :visitPrice )");
+        query.bindValue(":visitNum", visitNum->text().toInt());
         query.bindValue(":patientNum", patientNum->text().toInt());
         query.bindValue(":medicNum", medicNum->text().toInt());
-        query.bindValue(":dataOfIllness", QDate::fromString(dataOfIllness->text(), "dd.MM.yyyy"));
-        query.bindValue(":dataOfRecovery", QDate::fromString(dataOfRecovery->text(), "dd.MM.yyyy"));
+        query.bindValue(":visitDate", QDate::fromString(visitDate->text(), "dd.MM.yyyy"));
+        query.bindValue(":visitTime", QTime::fromString(visitTime->text(), "hh.mm.ss"));
+        query.bindValue(":visitReport", visitReport->text());
+        query.bindValue(":visitResult", visitResult->text());
+        query.bindValue(":visitPrice", visitPrice->text().toInt());
         if (query.exec()) {
             formWidget->close();
         } else {
@@ -350,10 +429,49 @@ void MainWindow::addDiseaseHistoryFormConfirmButtonClicked() {
     }
 }
 
-void MainWindow::writePatientOnOperationFormConfirmButtonClicked() {
+void MainWindow::on_MedicCard_triggered()
+{
+    QSqlQuery query;
 
-}
-
-void MainWindow::watchPatientDiseaseHistoryFormConfirmButtonClicked() {
-
+    query.prepare("CREATE TABLE `Hospital`.`TempTable` ( `НомерВрача` INT NOT NULL , `Фамилия` VARCHAR(30) NOT NULL , `Имя` VARCHAR(30) NOT NULL , `Отчество` VARCHAR(30) NOT NULL , "
+                  "`ДатаНайма` DATE NOT NULL , `Профессия` VARCHAR(30) NOT NULL , `НомерТелефона` VARCHAR(15) NOT NULL , "
+                  "PRIMARY KEY (`НомерВрача`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");
+    if (query.exec()) {
+        qDebug() << "Table Created";
+        query.prepare("INSERT INTO TempTable ( НомерВрача, Фамилия, Имя, Отчество, ДатаНайма, Профессия, НомерТелефона ) "
+                      "SELECT a.НомерВрача, a.Фамилия, a.Имя, a.Отчество, a.ДатаНайма, b.Профессия, a.НомерТелефона "
+                      "FROM Врачи a join ПрофессииВрача b "
+                      "WHERE a.НомерПрофессии = b.НомерПрофессии");
+        if (query.exec()) {
+            qDebug() << "Values Inserted";
+            query.prepare("SELECT * FROM TempTable");
+            if (query.exec()) {
+                QSqlTableModel *model = new QSqlTableModel(this, db);
+                model->setTable("TempTable");
+                model->select();
+                model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+                model->setHeaderData(1, Qt::Horizontal, tr("Фамилия"));
+                model->setHeaderData(2, Qt::Horizontal, tr("Имя"));
+                model->setHeaderData(3, Qt::Horizontal, tr("Отчество"));
+                model->setHeaderData(4, Qt::Horizontal, tr("Дата найма"));
+                model->setHeaderData(5, Qt::Horizontal, tr("Профессия"));
+                model->setHeaderData(6, Qt::Horizontal, tr("Номер телефона"));
+                QTableView *view = new QTableView;
+                view->setModel(model);
+                view->show();
+                query.prepare("DROP TABLE TempTable");
+                if (query.exec()) {
+                    qDebug() << "All Right";
+                } else {
+                    qDebug() << "Wery bad";
+                }
+            } else {
+                qDebug() << "Error while selecting from TempTable";
+            }
+        } else {
+            qDebug() << "Values Not Inserted";
+        }
+    } else {
+        qDebug() << "Table Not Created";
+    }
 }

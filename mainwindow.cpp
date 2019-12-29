@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
         form.addRow(new QLabel("Login:"), loginEdit);
         form.addRow(new QLabel("Password:"), passwordEdit);
         form.addRow(confirmButton, cancelButton);
-
         loginPage.exec();
     }
 }
@@ -473,5 +472,105 @@ void MainWindow::on_MedicCard_triggered()
         }
     } else {
         qDebug() << "Table Not Created";
+    }
+}
+
+void MainWindow::on_watchPatientDiseaseHistory_triggered()
+{
+    QDialog *enterPatientNumDialog = new QDialog();
+        QFormLayout dialogForm(enterPatientNumDialog);
+        patientNum = new QLineEdit(enterPatientNumDialog);
+        QPushButton *confirmButton = new QPushButton(enterPatientNumDialog);
+        connect(confirmButton, SIGNAL(clicked()), SLOT(watchPatientDiseaseHistoryConfirmButtonClicked()));
+        confirmButton->setText("Подтвердить:");
+        dialogForm.addRow(new QLabel("Номер пациента:"), patientNum);
+        dialogForm.addRow(confirmButton);
+        enterPatientNumDialog->show();
+}
+
+void MainWindow::watchPatientDiseaseHistoryConfirmButtonClicked() {
+    QSqlQuery query;
+
+    query.prepare("CREATE TABLE `Hospital`.`TempTable` ( `НомерПациента` INT NOT NULL , `ФИОПациента` VARCHAR(255) NOT NULL , `НомерЗаписи` INT NOT NULL , "
+                  "`НомерПосещения` INT NOT NULL , `Заболевание` VARCHAR(50) NOT NULL , `ДатаЗаболевания` DATE NOT NULL , "
+                  "`ДатаВыздоровления` DATE NOT NULL , PRIMARY KEY (`НомерПациента`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");
+    if (query.exec()) {
+        qDebug() << "Table Created";
+        query.prepare("INSERT INTO TempTable ( НомерПациента, ФИОПациента, НомерЗаписи, НомерПосещения, Заболевание, ДатаЗаболевания, ДатаВыздоровления ) "
+                      "SELECT c.НомерПациента, concat(b.Фамилия, ' ', b.Имя, ' ', b.Отчество), a.НомерЗаписи, a.НомерПосещения, d.Заболевание, a.ДатаЗаболевания, a.ДатаВыздоровления "
+                      "FROM ИсторияБолезни a join Посещение c on a.НомерПосещения = c.НомерПосещения "
+                      "JOIN ТипЗаболевания d on a.НомерЗаболевания = d.НомерЗаболевания "
+                      "JOIN Пациенты b on b.НомерПациента = c.НомерПациента");
+        if (query.exec()) {
+            qDebug() << "Values Inserted";
+            query.prepare("delete from TempTable where НомерПациента <> :patientNum");
+            query.bindValue(":patientNum", patientNum->text().toInt());
+            query.exec();
+            query.prepare("select * from TempTable");
+            QSqlTableModel *model = new QSqlTableModel(this, db);
+            model->setTable("TempTable");
+            model->select();
+            model->setHeaderData(0, Qt::Horizontal, tr("Номер пациента"));
+            model->setHeaderData(1, Qt::Horizontal, tr("ФИО Пациента"));
+            model->setHeaderData(2, Qt::Horizontal, tr("Номер записи"));
+            model->setHeaderData(3, Qt::Horizontal, tr("Номер посещения"));
+            model->setHeaderData(4, Qt::Horizontal, tr("Дата найма"));
+            model->setHeaderData(5, Qt::Horizontal, tr("Заболевание"));
+            model->setHeaderData(6, Qt::Horizontal, tr("Дата заболевания"));
+            model->setHeaderData(7, Qt::Horizontal, tr("Дата выздоровления"));
+            QTableView *view = new QTableView;
+            view->setModel(model);
+            view->show();
+            query.prepare("DROP TABLE TempTable");
+            query.exec();
+        } else {
+            qDebug() << "Values not inserted";
+            query.prepare("DROP TABLE TempTable");
+            query.exec();
+        }
+    } else {
+        qDebug() << "Table not created";
+    }
+}
+
+void MainWindow::on_watchOperationInThisMonth_triggered()
+{
+    QSqlQuery query;
+
+    query.prepare("CREATE TABLE `Hospital`.`TempTable` ( `НомерОперации` INT NOT NULL , `НомерТипаОперации` INT NOT NULL , `НомерИсторииБолезни` INT NOT NULL , "
+                  "`ДатаПроведеннойОперации` DATE NOT NULL , `ВремяНачалаОперации` TIME NOT NULL , "
+                  "PRIMARY KEY (`НомерОперации`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");
+    if (query.exec()) {
+        qDebug() << "Table created";
+        query.prepare("INSERT INTO TempTable ( НомерОперации, НомерТипаОперации, НомерИсторииБолезни, ДатаПроведеннойОперации, ВремяНачалаОперации ) "
+                      "SELECT * FROM Операции");
+        if (query.exec()) {
+            qDebug() << "Values inserted";
+            query.prepare("DELETE FROM TempTable WHERE MONTH(ДатаПроведеннойОперации) <> MONTH(:currentDate)");
+            QDate dt = QDate::currentDate();
+            query.bindValue(":currentDate", dt.toString("dd.MM.yyyy"));
+            query.exec();
+            query.prepare("select * from TempTable");
+            query.exec();
+            QSqlTableModel *model = new QSqlTableModel(this, db);
+            model->setTable("TempTable");
+            model->select();
+            model->setHeaderData(0, Qt::Horizontal, tr("Номер операции"));
+            model->setHeaderData(1, Qt::Horizontal, tr("Номер типа операции"));
+            model->setHeaderData(2, Qt::Horizontal, tr("Номер истории болезни"));
+            model->setHeaderData(3, Qt::Horizontal, tr("Дата проведённой операции"));
+            model->setHeaderData(3, Qt::Horizontal, tr("Время начала операции"));
+            QTableView *view = new QTableView;
+            view->setModel(model);
+            view->show();
+            query.prepare("DROP TABLE TempTable");
+            query.exec();
+        } else {
+            qDebug() << "Values not inserted";
+            query.prepare("DROP TABLE TempTable");
+            query.exec();
+        }
+    } else {
+        qDebug() << "Table not created";
     }
 }

@@ -41,15 +41,11 @@
     <property name="title">
      <string>Запросы</string>
     </property>
-    <addaction name="query1"/>
+    <addaction name="medicGraphic"/>
     <addaction name="watchPatientDiseaseHistory"/>
-    <addaction name="query3"/>
+    <addaction name="watchOperationInThisMonth"/>
     <addaction name="MedicCard"/>
-    <addaction name="query5"/>
-    <addaction name="query6"/>
-    <addaction name="query7"/>
-    <addaction name="query8"/>
-    <addaction name="query9"/>
+    <addaction name="watchAllOperations"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -113,7 +109,7 @@
     <string>Тип операции</string>
    </property>
   </action>
-  <action name="query1">
+  <action name="medicGraphic">
    <property name="text">
     <string>Занятость врача</string>
    </property>
@@ -123,7 +119,7 @@
     <string>История болезней бациента</string>
    </property>
   </action>
-  <action name="query3">
+  <action name="watchOperationInThisMonth">
    <property name="text">
     <string>Операции в этом месяце</string>
    </property>
@@ -133,29 +129,9 @@
     <string>Карточка врача</string>
    </property>
   </action>
-  <action name="query5">
+  <action name="watchAllOperations">
    <property name="text">
     <string>Просмотр всех операций</string>
-   </property>
-  </action>
-  <action name="query6">
-   <property name="text">
-    <string>Запрос №6</string>
-   </property>
-  </action>
-  <action name="query7">
-   <property name="text">
-    <string>Запрос №7</string>
-   </property>
-  </action>
-  <action name="query8">
-   <property name="text">
-    <string>Запрос №8</string>
-   </property>
-  </action>
-  <action name="query9">
-   <property name="text">
-    <string>Запрос №9</string>
    </property>
   </action>
   <action name="addDiseaseHistoryForm">
@@ -166,11 +142,6 @@
   <action name="writePatientOnOperationForm">
    <property name="text">
     <string>Запись пациента на операцию</string>
-   </property>
-  </action>
-  <action name="watchPatientDiseaseHistoryForm">
-   <property name="text">
-    <string>Просмотр истории болезней пациента</string>
    </property>
   </action>
   <action name="addPatientForm">

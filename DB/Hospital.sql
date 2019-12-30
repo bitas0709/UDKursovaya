@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:3306
--- Время создания: Дек 26 2019 г., 09:42
+-- Время создания: Дек 29 2019 г., 23:29
 -- Версия сервера: 5.7.28-0ubuntu0.19.04.2
 -- Версия PHP: 7.2.24-0ubuntu0.19.04.1
 
@@ -20,73 +20,44 @@ SET time_zone = "+00:00";
 -- База данных: `Hospital`
 --
 
--- --------------------------------------------------------
-
+DELIMITER $$
 --
--- Структура таблицы `DiseaseHistory`
+-- Процедуры
 --
+CREATE DEFINER=`bitas0709`@`%` PROCEDURE `WatchMedicsCard` ()  NO SQL
+SELECT a.НомерВрача, a.Фамилия, a.Имя, a.Отчество, a.ДатаНайма, b.Профессия, a.НомерТелефона
+FROM Врачи a join ПрофессииВрача b
+WHERE a.НомерПрофессии = b.НомерПрофессии$$
 
-CREATE TABLE `DiseaseHistory` (
-  `DiseaseHistoryNum` int(11) NOT NULL,
-  `DiseaseNum` int(11) NOT NULL,
-  `PatientNum` int(11) NOT NULL,
-  `MedicNum` int(11) NOT NULL,
-  `DateOfIllness` date NOT NULL,
-  `DateOfRecovery` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE DEFINER=`bitas0709`@`%` PROCEDURE `WatchMedicsCard1` (OUT `MedNum` INT, OUT `LastName` VARCHAR(30) CHARSET utf8mb4, OUT `FirstName` VARCHAR(30) CHARSET utf8mb4, OUT `HireDate` DATE, OUT `Profession` VARCHAR(30) CHARSET utf8mb4, OUT `MobileNum` VARCHAR(15) CHARSET utf8mb4)  NO SQL
+SELECT a.НомерВрача, a.Фамилия, a.Имя, a.Отчество, a.ДатаНайма, b.Профессия, a.НомерТелефона
+FROM Врачи a join ПрофессииВрача b
+WHERE a.НомерПрофессии = b.НомерПрофессии
+#set MedNum = a.НомерВрача#set LastName = a.Фамилия#set FirstName = a.Имя#set HireDate = a.ДатаНайма#set Profession = b.Профессия#set MobileNum = a.НомерТелефона$$
 
---
--- Дамп данных таблицы `DiseaseHistory`
---
-
-INSERT INTO `DiseaseHistory` (`DiseaseHistoryNum`, `DiseaseNum`, `PatientNum`, `MedicNum`, `DateOfIllness`, `DateOfRecovery`) VALUES
-(1, 2, 1, 3, '2019-05-15', '2019-06-02'),
-(2, 4, 2, 1, '2019-06-11', '2019-06-24'),
-(3, 3, 5, 3, '2019-04-29', '2019-05-12'),
-(4, 2, 4, 2, '2019-03-12', '2019-03-21');
+DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `DiseaseType`
+-- Структура таблицы `Врачи`
 --
 
-CREATE TABLE `DiseaseType` (
-  `DiseaseNum` int(11) NOT NULL,
-  `Disease` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+CREATE TABLE `Врачи` (
+  `НомерВрача` int(11) NOT NULL,
+  `Фамилия` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Имя` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Отчество` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ДатаНайма` date NOT NULL,
+  `НомерПрофессии` int(11) NOT NULL,
+  `НомерТелефона` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Дамп данных таблицы `DiseaseType`
+-- Дамп данных таблицы `Врачи`
 --
 
-INSERT INTO `DiseaseType` (`DiseaseNum`, `Disease`) VALUES
-(1, 'Заболевание1'),
-(2, 'Заболевание2'),
-(3, 'Заболевание3'),
-(4, 'Заболевание4');
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `Medic`
---
-
-CREATE TABLE `Medic` (
-  `MedicNum` int(11) NOT NULL,
-  `LastName` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FirstName` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FatherName` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `HireDate` date NOT NULL,
-  `ProfessionNum` int(11) NOT NULL,
-  `MobileNum` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Дамп данных таблицы `Medic`
---
-
-INSERT INTO `Medic` (`MedicNum`, `LastName`, `FirstName`, `FatherName`, `HireDate`, `ProfessionNum`, `MobileNum`) VALUES
+INSERT INTO `Врачи` (`НомерВрача`, `Фамилия`, `Имя`, `Отчество`, `ДатаНайма`, `НомерПрофессии`, `НомерТелефона`) VALUES
 (1, 'Григорян', 'Александр', 'Владимирович', '2017-03-12', 1, '1415642451'),
 (2, 'Жучков', 'Георгий', 'Викторович', '2010-05-04', 2, '1515436785'),
 (3, 'Наумов', 'Николай', 'Алексеевич', '2019-01-15', 1, '9515745671'),
@@ -96,19 +67,129 @@ INSERT INTO `Medic` (`MedicNum`, `LastName`, `FirstName`, `FatherName`, `HireDat
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `MedicProfession`
+-- Структура таблицы `ИсторияБолезни`
 --
 
-CREATE TABLE `MedicProfession` (
-  `ProfessionNum` int(11) NOT NULL,
-  `Profession` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+CREATE TABLE `ИсторияБолезни` (
+  `НомерЗаписи` int(11) NOT NULL,
+  `НомерПосещения` int(11) NOT NULL,
+  `НомерЗаболевания` int(11) NOT NULL,
+  `ДатаЗаболевания` date NOT NULL,
+  `ДатаВыздоровления` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Дамп данных таблицы `MedicProfession`
+-- Дамп данных таблицы `ИсторияБолезни`
 --
 
-INSERT INTO `MedicProfession` (`ProfessionNum`, `Profession`) VALUES
+INSERT INTO `ИсторияБолезни` (`НомерЗаписи`, `НомерПосещения`, `НомерЗаболевания`, `ДатаЗаболевания`, `ДатаВыздоровления`) VALUES
+(1, 1, 1, '2019-05-12', '2019-05-30'),
+(2, 2, 3, '2019-05-12', '2019-05-25'),
+(3, 3, 4, '2019-05-20', '2019-05-31'),
+(4, 7, 2, '2019-12-20', '2019-12-31');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Операции`
+--
+
+CREATE TABLE `Операции` (
+  `НомерОперации` int(11) NOT NULL,
+  `НомерТипаОперации` int(11) NOT NULL,
+  `НомерИсторииБолезни` int(11) NOT NULL,
+  `ДатаПроведенияОперации` date NOT NULL,
+  `ВремяНачалаОперации` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `Операции`
+--
+
+INSERT INTO `Операции` (`НомерОперации`, `НомерТипаОперации`, `НомерИсторииБолезни`, `ДатаПроведенияОперации`, `ВремяНачалаОперации`) VALUES
+(1, 1, 1, '2019-05-20', '16:30:00'),
+(2, 3, 2, '2019-05-18', '12:30:00'),
+(3, 4, 3, '2019-05-25', '14:00:00'),
+(4, 2, 4, '2019-12-23', '16:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Пациенты`
+--
+
+CREATE TABLE `Пациенты` (
+  `НомерПациента` int(11) NOT NULL,
+  `Фамилия` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Имя` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Отчество` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Пол` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ДатаРождения` date NOT NULL,
+  `Адрес` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `НомерМедПолиса` int(16) NOT NULL,
+  `НомерПаспорта` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `НомерТелефона` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `Пациенты`
+--
+
+INSERT INTO `Пациенты` (`НомерПациента`, `Фамилия`, `Имя`, `Отчество`, `Пол`, `ДатаРождения`, `Адрес`, `НомерМедПолиса`, `НомерПаспорта`, `НомерТелефона`) VALUES
+(1, 'Алексеев', 'Иван', 'Геннадьевич', 'Мужской', '1975-12-25', 'мкр. Комсомолец, д. 21', 23457654, '56НМ756498', '9516754726'),
+(2, 'Мизынчук', 'Артём', 'Сергеевич', 'Мужской', '1985-02-16', 'ул. Приборостроителей, д. 121', 46573865, '56АУ574621', '9045764612'),
+(3, 'Савайтан', 'Олег', 'Петрович', 'Мужской', '1991-05-12', 'ул. Конева, д. 16', 46572652, '67НА576486', '9245865746'),
+(4, 'Кривошеев', 'Алексей', 'Сергеевич', 'Мужской', '1992-07-21', 'мкр. Дубрава, д. 5', 57461264, '86АУ869532', '9125742654'),
+(5, 'Рыжикова', 'Светлана', 'Олеговна', 'Женский', '1962-03-01', 'мкр. Парковый, д. 1', 57625786, '75НА284757', '9543235891'),
+(6, 'Уваров', 'Альберт', 'Алексеевич', 'Мужской', '1996-01-22', 'ул. Молодогвардеец, д. 4', 47261263, '56АМ574612', ''),
+(7, 'Халапян', 'Георгий', 'Александрович', 'Мужской', '1997-09-02', 'ул. Матросова, д.6', 74621823, '28НА741231', '9231238712');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Посещение`
+--
+
+CREATE TABLE `Посещение` (
+  `НомерПосещения` int(11) NOT NULL,
+  `НомерПациента` int(11) NOT NULL,
+  `НомерВрача` int(11) NOT NULL,
+  `ДатаПосещения` date NOT NULL,
+  `ВремяПосещения` time NOT NULL,
+  `Жалоба` varchar(2048) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `РезультатОбследования` varchar(4096) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Цена` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `Посещение`
+--
+
+INSERT INTO `Посещение` (`НомерПосещения`, `НомерПациента`, `НомерВрача`, `ДатаПосещения`, `ВремяПосещения`, `Жалоба`, `РезультатОбследования`, `Цена`) VALUES
+(1, 1, 2, '2019-05-12', '12:00:00', 'Жалоба', 'Всё Плохо', 2000),
+(2, 4, 1, '2019-05-12', '13:00:00', 'Жалоба', 'Требуется Операция', 4000),
+(3, 2, 4, '2019-05-20', '14:00:00', 'Жалоба', 'Требуется Операция', 3000),
+(4, 7, 5, '2019-06-15', '11:30:00', 'Жалоба', 'Всё Плохо', 5000),
+(5, 3, 3, '2012-08-20', '16:00:00', 'Жалоба', 'Все ясно', 3000),
+(6, 5, 2, '2019-07-16', '12:00:00', 'Жалоба', 'Обследование', 3000),
+(7, 6, 1, '2019-12-20', '11:00:00', 'Жалоба', 'Нужна операция', 2000);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `ПрофессииВрача`
+--
+
+CREATE TABLE `ПрофессииВрача` (
+  `НомерПрофессии` int(11) NOT NULL,
+  `Профессия` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `ПрофессииВрача`
+--
+
+INSERT INTO `ПрофессииВрача` (`НомерПрофессии`, `Профессия`) VALUES
 (1, 'Профессия1'),
 (2, 'Профессия2'),
 (3, 'Профессия3'),
@@ -117,153 +198,135 @@ INSERT INTO `MedicProfession` (`ProfessionNum`, `Profession`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `Operation`
+-- Структура таблицы `ТипЗаболевания`
 --
 
-CREATE TABLE `Operation` (
-  `OperationNum` int(11) NOT NULL,
-  `OperationTypeNum` int(11) NOT NULL,
-  `DiseaseHistoryNum` int(11) NOT NULL,
-  `OperationDate` date NOT NULL
+CREATE TABLE `ТипЗаболевания` (
+  `НомерЗаболевания` int(11) NOT NULL,
+  `Заболевание` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Дамп данных таблицы `Operation`
+-- Дамп данных таблицы `ТипЗаболевания`
 --
 
-INSERT INTO `Operation` (`OperationNum`, `OperationTypeNum`, `DiseaseHistoryNum`, `OperationDate`) VALUES
-(1, 2, 1, '2019-05-25'),
-(2, 3, 2, '2019-06-15'),
-(3, 3, 3, '2019-04-30'),
-(4, 1, 4, '2019-03-15');
+INSERT INTO `ТипЗаболевания` (`НомерЗаболевания`, `Заболевание`) VALUES
+(1, 'Заболевание1'),
+(2, 'Заболевание2'),
+(3, 'Заболевание3'),
+(4, 'Заболевание4');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `OperationType`
+-- Структура таблицы `ТипОперации`
 --
 
-CREATE TABLE `OperationType` (
-  `OperationNum` int(11) NOT NULL,
-  `Operation` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
+CREATE TABLE `ТипОперации` (
+  `НомерОперации` int(11) NOT NULL,
+  `Операция` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ВремяПроведения` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Дамп данных таблицы `OperationType`
+-- Дамп данных таблицы `ТипОперации`
 --
 
-INSERT INTO `OperationType` (`OperationNum`, `Operation`) VALUES
-(1, 'Операция1'),
-(2, 'Операция2'),
-(3, 'Операция3'),
-(4, 'Операция4');
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `Patient`
---
-
-CREATE TABLE `Patient` (
-  `PatientNum` int(11) NOT NULL,
-  `LastName` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FirstName` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FatherName` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Sex` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `BirthDate` date NOT NULL,
-  `Address` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `MedPolisNum` int(16) NOT NULL,
-  `PassportNum` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `MobileNum` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Дамп данных таблицы `Patient`
---
-
-INSERT INTO `Patient` (`PatientNum`, `LastName`, `FirstName`, `FatherName`, `Sex`, `BirthDate`, `Address`, `MedPolisNum`, `PassportNum`, `MobileNum`) VALUES
-(1, 'Алексеев', 'Иван', 'Геннадьевич', 'Мужской', '1975-12-25', 'мкр. Комсомолец, д. 21', 23457654, '56НМ756498', '9516754726'),
-(2, 'Мизынчук', 'Артём', 'Сергеевич', 'Мужской', '1985-02-16', 'ул. Приборостроителей, д. 121', 46573865, '56АУ574621', '9045764612'),
-(3, 'Савайтан', 'Олег', 'Петрович', 'Мужской', '1991-05-12', 'ул. Конева, д. 16', 46572652, '67НА576486', '9245865746'),
-(4, 'Кривошеев', 'Алексей', 'Сергеевич', 'Мужской', '1992-07-21', 'мкр. Дубрава, д. 5', 57461264, '86АУ869532', '9125742654'),
-(5, 'Рыжикова', 'Светлана', 'Олеговна', 'Женский', '1962-03-01', 'мкр. Парковый, д. 1', 57625786, '75НА284757', '9543235891');
+INSERT INTO `ТипОперации` (`НомерОперации`, `Операция`, `ВремяПроведения`) VALUES
+(1, 'Операция1', '00:30:00'),
+(2, 'Операция2', '01:00:00'),
+(3, 'Операция3', '00:40:00'),
+(4, 'Операция4', '06:00:00');
 
 --
 -- Индексы сохранённых таблиц
 --
 
 --
--- Индексы таблицы `DiseaseHistory`
+-- Индексы таблицы `Врачи`
 --
-ALTER TABLE `DiseaseHistory`
-  ADD PRIMARY KEY (`DiseaseHistoryNum`),
-  ADD KEY `DiseaseHistory_ifbk_1` (`DiseaseNum`),
-  ADD KEY `DiseaseHistory_ifbk_2` (`PatientNum`),
-  ADD KEY `DiseaseHistory_ifbk_3` (`MedicNum`);
+ALTER TABLE `Врачи`
+  ADD PRIMARY KEY (`НомерВрача`),
+  ADD KEY `Medic_ifbk_1` (`НомерПрофессии`);
 
 --
--- Индексы таблицы `DiseaseType`
+-- Индексы таблицы `ИсторияБолезни`
 --
-ALTER TABLE `DiseaseType`
-  ADD PRIMARY KEY (`DiseaseNum`);
+ALTER TABLE `ИсторияБолезни`
+  ADD PRIMARY KEY (`НомерЗаписи`),
+  ADD KEY `DiseaseHistory_ifbk_1` (`НомерПосещения`),
+  ADD KEY `DiseaseHistory_ifbk_2` (`НомерЗаболевания`);
 
 --
--- Индексы таблицы `Medic`
+-- Индексы таблицы `Операции`
 --
-ALTER TABLE `Medic`
-  ADD PRIMARY KEY (`MedicNum`),
-  ADD KEY `Medic_ifbk_1` (`ProfessionNum`);
+ALTER TABLE `Операции`
+  ADD PRIMARY KEY (`НомерОперации`),
+  ADD KEY `Operation_ifbk_1` (`НомерТипаОперации`),
+  ADD KEY `Operation_ifbk_2` (`НомерИсторииБолезни`);
 
 --
--- Индексы таблицы `MedicProfession`
+-- Индексы таблицы `Пациенты`
 --
-ALTER TABLE `MedicProfession`
-  ADD PRIMARY KEY (`ProfessionNum`);
+ALTER TABLE `Пациенты`
+  ADD PRIMARY KEY (`НомерПациента`);
 
 --
--- Индексы таблицы `Operation`
+-- Индексы таблицы `Посещение`
 --
-ALTER TABLE `Operation`
-  ADD PRIMARY KEY (`OperationNum`),
-  ADD KEY `Operation_ifbk_1` (`OperationTypeNum`),
-  ADD KEY `Operation_ifbk_2` (`DiseaseHistoryNum`);
+ALTER TABLE `Посещение`
+  ADD PRIMARY KEY (`НомерПосещения`),
+  ADD KEY `Limit1` (`НомерПациента`),
+  ADD KEY `Limit2` (`НомерВрача`);
 
 --
--- Индексы таблицы `OperationType`
+-- Индексы таблицы `ПрофессииВрача`
 --
-ALTER TABLE `OperationType`
-  ADD PRIMARY KEY (`OperationNum`);
+ALTER TABLE `ПрофессииВрача`
+  ADD PRIMARY KEY (`НомерПрофессии`);
 
 --
--- Индексы таблицы `Patient`
+-- Индексы таблицы `ТипЗаболевания`
 --
-ALTER TABLE `Patient`
-  ADD PRIMARY KEY (`PatientNum`);
+ALTER TABLE `ТипЗаболевания`
+  ADD PRIMARY KEY (`НомерЗаболевания`);
+
+--
+-- Индексы таблицы `ТипОперации`
+--
+ALTER TABLE `ТипОперации`
+  ADD PRIMARY KEY (`НомерОперации`);
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Ограничения внешнего ключа таблицы `DiseaseHistory`
+-- Ограничения внешнего ключа таблицы `Врачи`
 --
-ALTER TABLE `DiseaseHistory`
-  ADD CONSTRAINT `DiseaseHistory_ifbk_1` FOREIGN KEY (`DiseaseNum`) REFERENCES `DiseaseType` (`DiseaseNum`),
-  ADD CONSTRAINT `DiseaseHistory_ifbk_2` FOREIGN KEY (`PatientNum`) REFERENCES `Patient` (`PatientNum`),
-  ADD CONSTRAINT `DiseaseHistory_ifbk_3` FOREIGN KEY (`MedicNum`) REFERENCES `Medic` (`MedicNum`);
+ALTER TABLE `Врачи`
+  ADD CONSTRAINT `Medic_ifbk_1` FOREIGN KEY (`НомерПрофессии`) REFERENCES `ПрофессииВрача` (`НомерПрофессии`);
 
 --
--- Ограничения внешнего ключа таблицы `Medic`
+-- Ограничения внешнего ключа таблицы `ИсторияБолезни`
 --
-ALTER TABLE `Medic`
-  ADD CONSTRAINT `Medic_ifbk_1` FOREIGN KEY (`ProfessionNum`) REFERENCES `MedicProfession` (`ProfessionNum`);
+ALTER TABLE `ИсторияБолезни`
+  ADD CONSTRAINT `DiseaseHistory_ifbk_1` FOREIGN KEY (`НомерПосещения`) REFERENCES `Посещение` (`НомерПосещения`),
+  ADD CONSTRAINT `DiseaseHistory_ifbk_2` FOREIGN KEY (`НомерЗаболевания`) REFERENCES `ТипЗаболевания` (`НомерЗаболевания`);
 
 --
--- Ограничения внешнего ключа таблицы `Operation`
+-- Ограничения внешнего ключа таблицы `Операции`
 --
-ALTER TABLE `Operation`
-  ADD CONSTRAINT `Operation_ifbk_1` FOREIGN KEY (`OperationTypeNum`) REFERENCES `OperationType` (`OperationNum`),
-  ADD CONSTRAINT `Operation_ifbk_2` FOREIGN KEY (`DiseaseHistoryNum`) REFERENCES `DiseaseHistory` (`DiseaseHistoryNum`);
+ALTER TABLE `Операции`
+  ADD CONSTRAINT `Operation_ifbk_1` FOREIGN KEY (`НомерТипаОперации`) REFERENCES `ТипОперации` (`НомерОперации`),
+  ADD CONSTRAINT `Operation_ifbk_2` FOREIGN KEY (`НомерИсторииБолезни`) REFERENCES `ИсторияБолезни` (`НомерЗаписи`);
+
+--
+-- Ограничения внешнего ключа таблицы `Посещение`
+--
+ALTER TABLE `Посещение`
+  ADD CONSTRAINT `Limit1` FOREIGN KEY (`НомерПациента`) REFERENCES `Пациенты` (`НомерПациента`),
+  ADD CONSTRAINT `Limit2` FOREIGN KEY (`НомерВрача`) REFERENCES `Врачи` (`НомерВрача`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

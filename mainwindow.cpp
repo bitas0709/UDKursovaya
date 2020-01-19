@@ -218,6 +218,15 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
     diseaseNum = new QLineEdit(formWidget);
     dataOfIllness = new QLineEdit(formWidget);
     dataOfRecovery = new QLineEdit(formWidget);
+    int maxNum = 1;
+    QSqlQuery query;
+    query.prepare("SELECT MAX(НомерЗаписи) FROM ИсторияБолезни");
+    query.exec();
+    while(query.next()) {
+        maxNum = query.value(0).toInt();
+        maxNum += 1;
+    }
+    diseaseHistoryNum->setText(QString::number(maxNum));
     QPushButton *confirmButton = new QPushButton(formWidget);
     connect(confirmButton, SIGNAL(clicked()), SLOT(addDiseaseHistoryFormConfirmButtonClicked()));
     QPushButton *cancelButton = new QPushButton(formWidget);
@@ -265,6 +274,15 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
     diseaseHistoryNum = new QLineEdit(formWidget);
     operationDate = new QLineEdit(formWidget);
     operationStartTime = new QLineEdit(formWidget);
+    int maxNum = 1;
+    QSqlQuery query;
+    query.prepare("SELECT MAX(НомерОперации) FROM Операции");
+    query.exec();
+    while(query.next()) {
+        maxNum = query.value(0).toInt();
+        maxNum += 1;
+    }
+    operationNum->setText(QString::number(maxNum));
     QPushButton *confirmButton = new QPushButton(formWidget);
     connect(confirmButton, SIGNAL(clicked()), SLOT(writePatientOnOperationFormConfirmButtonClicked()));
     QPushButton *cancelButton = new QPushButton(formWidget);
@@ -317,6 +335,15 @@ void MainWindow::on_addPatientForm_triggered()
     medPolisNum = new QLineEdit(formWidget);
     passportNum = new QLineEdit(formWidget);
     mobileNum = new QLineEdit(formWidget);
+    int maxNum = 1;
+    QSqlQuery query;
+    query.prepare("SELECT MAX(НомерПациента) FROM Пациенты");
+    query.exec();
+    while(query.next()) {
+        maxNum = query.value(0).toInt();
+        maxNum += 1;
+    }
+    patientNum->setText(QString::number(maxNum));
     QPushButton *confirmButton = new QPushButton(formWidget);
     connect(confirmButton, SIGNAL(clicked()), SLOT(addPatientFormConfirmButtonClicked()));
     QPushButton *cancelButton = new QPushButton(formWidget);
@@ -371,24 +398,48 @@ void MainWindow::addPatientFormConfirmButtonClicked() {
 
 void MainWindow::on_addPatientToVisit_triggered()
 {
+    int maxNum = 1;
     formWidget = new QWidget();
     QFormLayout form(formWidget);
     visitNum = new QLineEdit(formWidget);
-    patientNum = new QLineEdit(formWidget);
-    medicNum = new QLineEdit(formWidget);
+    patientFIO = new QComboBox(formWidget);
+    medicFIO = new QComboBox(formWidget);
+    //patientNum = new QLineEdit(formWidget);
+    //medicNum = new QLineEdit(formWidget);
     visitDate = new QLineEdit(formWidget);
     visitTime = new QLineEdit(formWidget);
     visitReport = new QLineEdit(formWidget);
     visitResult = new QLineEdit(formWidget);
     visitPrice = new QLineEdit(formWidget);
+    QSqlQuery query;
+    query.prepare("SELECT MAX(НомерПосещения) FROM Посещение");
+    query.exec();
+    while(query.next()) {
+        maxNum = query.value(0).toInt();
+        maxNum += 1;
+    }
+    query.prepare("SELECT CONCAT(Фамилия, ' ', Имя, ' ', Отчество) FROM Пациенты");
+    query.exec();
+    while(query.next()) {
+        patientFIO->addItem(query.value(0).toString());
+        //qDebug() << query.value(0).toString();
+    }
+    query.prepare("SELECT CONCAT(Фамилия, ' ', Имя, ' ', Отчество) FROM Врачи");
+    query.exec();
+    while(query.next()) {
+        medicFIO->addItem(query.value(0).toString());
+    }
     QPushButton *confirmButton = new QPushButton(formWidget);
     connect(confirmButton, SIGNAL(clicked()), SLOT(addPatientToVisitConfirmButtonClicked()));
     QPushButton *cancelButton = new QPushButton(formWidget);
     confirmButton->setText("Добавить");
     cancelButton->setText("Отмена");
     form.addRow(new QLabel("Номер посещения:"), visitNum);
-    form.addRow(new QLabel("Номер пациента:"), patientNum);
-    form.addRow(new QLabel("Номер врача:"), medicNum);
+    visitNum->setText(QString::number(maxNum));
+    //form.addRow(new QLabel("Номер пациента:"), patientNum);
+    form.addRow(new QLabel("ФИО Пациента"), patientFIO);
+    form.addRow(new QLabel("ФИО Врача"), medicFIO);
+    //form.addRow(new QLabel("Номер врача:"), medicNum);
     form.addRow(new QLabel("Дата посещения:"), visitDate);
     form.addRow(new QLabel("Время посещения:"), visitTime);
     form.addRow(new QLabel("Жалоба:"), visitReport);
@@ -400,8 +451,8 @@ void MainWindow::on_addPatientToVisit_triggered()
 
 void MainWindow::addPatientToVisitConfirmButtonClicked() {
     if (!visitNum->text().isEmpty() &&
-            !patientNum->text().isEmpty() &&
-            !medicNum->text().isEmpty() &&
+            //!patientNum->text().isEmpty() &&
+            //!medicNum->text().isEmpty() &&
             !visitDate->text().isEmpty() &&
             !visitTime->text().isEmpty() &&
             !visitReport->text().isEmpty() &&
@@ -411,8 +462,12 @@ void MainWindow::addPatientToVisitConfirmButtonClicked() {
         query.prepare("INSERT INTO Посещение (НомерПосещения, НомерПациента, НомерВрача, ДатаПосещения, ВремяПосещения, Жалоба, РезультатОбследования, Цена) "
                       "VALUES ( :visitNum, :patientNum, :medicNum, :visitDate, :visitTime, :visitReport, :visitResult, :visitPrice )");
         query.bindValue(":visitNum", visitNum->text().toInt());
-        query.bindValue(":patientNum", patientNum->text().toInt());
-        query.bindValue(":medicNum", medicNum->text().toInt());
+        //query.bindValue(":patientNum", patientNum->text().toInt());
+        //query.bindValue(":medicNum", medicNum->text().toInt());
+        query.bindValue(":patientNum", patientFIO->currentIndex() + 1);
+        query.bindValue(":medicNum", medicFIO->currentIndex() + 1);
+        qDebug() << patientFIO->currentIndex() + 1;
+        qDebug() << medicFIO->currentIndex() + 1;
         query.bindValue(":visitDate", QDate::fromString(visitDate->text(), "dd.MM.yyyy"));
         query.bindValue(":visitTime", QTime::fromString(visitTime->text(), "hh.mm.ss"));
         query.bindValue(":visitReport", visitReport->text());

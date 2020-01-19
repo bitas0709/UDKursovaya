@@ -8,6 +8,7 @@
 #include <QTime>
 #include <QTableView>
 #include <QDialogButtonBox>
+#include <QComboBox>
 #include <QPushButton>
 #include <QFormLayout>
 #include <QLabel>
@@ -55,6 +56,8 @@ public:
 
     //История Болезней
     QLineEdit *diseaseHistoryNum;
+    QComboBox *patientFIO;
+    QComboBox *medicFIO;
     QLineEdit *diseaseNum;
     QLineEdit *dataOfIllness;
     QLineEdit *dataOfRecovery;

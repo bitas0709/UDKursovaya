@@ -45,7 +45,6 @@
     <addaction name="watchPatientDiseaseHistory"/>
     <addaction name="watchOperationInThisMonth"/>
     <addaction name="MedicCard"/>
-    <addaction name="watchAllOperations"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -119,11 +118,6 @@
   <action name="MedicCard">
    <property name="text">
     <string>Карточка врача</string>
-   </property>
-  </action>
-  <action name="watchAllOperations">
-   <property name="text">
-    <string>Просмотр всех операций</string>
    </property>
   </action>
   <action name="addDiseaseHistoryForm">

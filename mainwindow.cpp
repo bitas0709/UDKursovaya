@@ -233,10 +233,10 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
     confirmButton->setText("Добавить");
     cancelButton->setText("Отмена");
     form.addRow(new QLabel("Номер записи:"), diseaseHistoryNum);
-    form.addRow(new QLabel("Номер посещения"), visitNum);
-    form.addRow(new QLabel("Номер типа болезни"), diseaseNum);
-    form.addRow(new QLabel("Дата заболевания"), dataOfIllness);
-    form.addRow(new QLabel("Дата выздоровления"), dataOfRecovery);
+    form.addRow(new QLabel("Номер посещения:"), visitNum);
+    form.addRow(new QLabel("Номер типа болезни:"), diseaseNum);
+    form.addRow(new QLabel("Дата заболевания:"), dataOfIllness);
+    form.addRow(new QLabel("Дата выздоровления:"), dataOfRecovery);
     form.addRow(confirmButton, cancelButton);
     formWidget->show();
 }
@@ -628,4 +628,51 @@ void MainWindow::on_watchOperationInThisMonth_triggered()
     } else {
         qDebug() << "Table not created";
     }
+}
+
+void MainWindow::on_medicGraphic_triggered()
+{
+
+    QDialog *enterMedicFIODialog = new QDialog();
+    medicFIO = new QComboBox(enterMedicFIODialog);
+    QPushButton *confirmButton = new QPushButton(enterMedicFIODialog);
+    connect(confirmButton, SIGNAL(clicked()), SLOT(watchMedicWorkloadConfirmButtonClicked()));
+    confirmButton->setText("Подтвердить");
+    QFormLayout dialogForm(enterMedicFIODialog);
+    dialogForm.addRow(new QLabel("Выбор врача:"), medicFIO);
+    dialogForm.addRow(confirmButton);
+
+    QSqlQuery query;
+
+    query.prepare("SELECT CONCAT(Фамилия, ' ', Имя, ' ', Отчество) FROM Врачи");
+    query.exec();
+    while(query.next()) {
+        medicFIO->addItem(query.value(0).toString());
+    }
+
+    enterMedicFIODialog->show();
+}
+
+void MainWindow::watchMedicWorkloadConfirmButtonClicked() {
+    QSqlQuery query;
+
+    /*query.prepare("CREATE TABLE `Hospital`.`TempTable` ( `НомерОперации` INT NOT NULL , `НомерТипаОперации` INT NOT NULL , `НомерИсторииБолезни` INT NOT NULL , "
+                  "`ДатаПроведеннойОперации` DATE NOT NULL , `ВремяНачалаОперации` TIME NOT NULL , "
+                  "PRIMARY KEY (`НомерОперации`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");*/
+
+    if (query.exec()) {
+        qDebug() << "Table created";
+        query.prepare("");
+    } else {
+        qDebug() << "Table not created";
+    }
+
+
+    QSqlTableModel *model = new QSqlTableModel(this, db);
+    model->setTable("TempTable");
+    model->select();
+    QTableView *view = new QTableView;
+    view->setModel(model);
+    view->show();
+
 }

@@ -90,6 +90,7 @@ private slots:
     void addPatientFormConfirmButtonClicked();
     void addPatientToVisitConfirmButtonClicked();
     void watchPatientDiseaseHistoryConfirmButtonClicked();
+    void watchMedicWorkloadConfirmButtonClicked();
 
     void on_patientTable_triggered();
     void on_medicTable_triggered();
@@ -106,6 +107,7 @@ private slots:
     void on_MedicCard_triggered();
     void on_watchPatientDiseaseHistory_triggered();
     void on_watchOperationInThisMonth_triggered();
+    void on_medicGraphic_triggered();
 };
 
 #endif // MAINWINDOW_H

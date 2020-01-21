@@ -235,8 +235,8 @@ void MainWindow::on_addDiseaseHistoryForm_triggered()
     form.addRow(new QLabel("Номер записи:"), diseaseHistoryNum);
     form.addRow(new QLabel("Номер посещения:"), visitNum);
     form.addRow(new QLabel("Номер типа болезни:"), diseaseNum);
-    form.addRow(new QLabel("Дата заболевания:"), dataOfIllness);
-    form.addRow(new QLabel("Дата выздоровления:"), dataOfRecovery);
+    form.addRow(new QLabel("Дата заболевания: (дд.мм.гггг)"), dataOfIllness);
+    form.addRow(new QLabel("Дата выздоровления: (дд.мм.гггг)"), dataOfRecovery);
     form.addRow(confirmButton, cancelButton);
     formWidget->show();
 }
@@ -298,8 +298,8 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
     form.addRow(new QLabel("Номер типа операции:"), operationTypeNum);
     form.addRow(new QLabel("Номер записи в истории болезней:"), diseaseHistoryNum);
     form.addRow(new QLabel("Врач:"), medicFIO);
-    form.addRow(new QLabel("Дата проведения операции:"), operationDate);
-    form.addRow(new QLabel("Время начала операции:"), operationStartTime);
+    form.addRow(new QLabel("Дата проведения операции: (дд.мм.гггг"), operationDate);
+    form.addRow(new QLabel("Время начала операции: (чч:мм:сс"), operationStartTime);
     form.addRow(confirmButton, cancelButton);
     formWidget->show();
 }
@@ -362,7 +362,7 @@ void MainWindow::on_addPatientForm_triggered()
     form.addRow(new QLabel("Имя:"), firstName);
     form.addRow(new QLabel("Отчество:"), fatherName);
     form.addRow(new QLabel("Пол:"), sex);
-    form.addRow(new QLabel("Дата рождения:"), birthDate);
+    form.addRow(new QLabel("Дата рождения: (дд.мм.гггг)"), birthDate);
     form.addRow(new QLabel("Адрес:"), address);
     form.addRow(new QLabel("Номер мед. полиса:"), medPolisNum);
     form.addRow(new QLabel("Серия и номер паспорта:"), passportNum);
@@ -448,8 +448,8 @@ void MainWindow::on_addPatientToVisit_triggered()
     form.addRow(new QLabel("ФИО Пациента"), patientFIO);
     form.addRow(new QLabel("ФИО Врача"), medicFIO);
     //form.addRow(new QLabel("Номер врача:"), medicNum);
-    form.addRow(new QLabel("Дата посещения:"), visitDate);
-    form.addRow(new QLabel("Время посещения:"), visitTime);
+    form.addRow(new QLabel("Дата посещения: (дд.мм.гггг)"), visitDate);
+    form.addRow(new QLabel("Время посещения: (чч:мм:сс)"), visitTime);
     form.addRow(new QLabel("Жалоба:"), visitReport);
     form.addRow(new QLabel("Результат обследования:"), visitResult);
     form.addRow(new QLabel("Цена:"), visitPrice);
@@ -467,24 +467,132 @@ void MainWindow::addPatientToVisitConfirmButtonClicked() {
             !visitResult->text().isEmpty() &&
             !visitPrice->text().isEmpty()) {
         QSqlQuery query;
-        query.prepare("INSERT INTO Посещение (НомерПосещения, НомерПациента, НомерВрача, ДатаПосещения, ВремяПосещения, Жалоба, РезультатОбследования, Цена) "
-                      "VALUES ( :visitNum, :patientNum, :medicNum, :visitDate, :visitTime, :visitReport, :visitResult, :visitPrice )");
-        query.bindValue(":visitNum", visitNum->text().toInt());
-        //query.bindValue(":patientNum", patientNum->text().toInt());
-        //query.bindValue(":medicNum", medicNum->text().toInt());
-        query.bindValue(":patientNum", patientFIO->currentIndex() + 1);
-        query.bindValue(":medicNum", medicFIO->currentIndex() + 1);
-        qDebug() << patientFIO->currentIndex() + 1;
-        qDebug() << medicFIO->currentIndex() + 1;
-        query.bindValue(":visitDate", QDate::fromString(visitDate->text(), "dd.MM.yyyy"));
-        query.bindValue(":visitTime", QTime::fromString(visitTime->text(), "hh.mm.ss"));
-        query.bindValue(":visitReport", visitReport->text());
-        query.bindValue(":visitResult", visitResult->text());
-        query.bindValue(":visitPrice", visitPrice->text().toInt());
+        query.prepare("DROP TABLE IF EXISTS `Hospital`.`TempTable`");
+        query.exec();
+        query.prepare("CALL `CreateTableMedicWorkLoad1` (:medNum, :visitTime)");
+        qDebug() << "medicFIO current index is" << medicFIO->currentIndex() + 1;
+        query.bindValue(":medNum", medicFIO->currentIndex() + 1);
+        query.bindValue(":visitTime", QTime::fromString("00:30:00"));
         if (query.exec()) {
-            formWidget->close();
+            qDebug() << "All set";
+            query.prepare("SELECT * FROM TempTable");
+            query.exec();
+            QVector<QDate> OperationStartDay;
+            QVector<QTime> OperationStartTime;
+            QVector<QTime> OperationTime;
+            QVector<QTime> OperationEndTime;
+            QVector<QDate> VisitDate;
+            QVector<QTime> VisitStartTime;
+            QVector<QTime> VisitTime;
+            QVector<QTime> VisitEndTime;
+
+            QDate VisitNewDate;
+            VisitNewDate = QDate::fromString(visitDate->text(), "dd.MM.yyyy");
+            QTime VisitNewStartTime;
+            VisitNewStartTime = QTime::fromString(visitTime->text());
+            QTime VisitNewEndTime;
+            VisitNewEndTime = QTime::fromString(visitTime->text(), "hh.mm.ss");
+            VisitNewEndTime = VisitNewEndTime.addSecs(30 * 60); // добавить 30 минут
+
+            while (query.next()) {
+                OperationStartDay.push_back(query.value(1).toDate());
+                OperationStartTime.push_back(query.value(2).toTime());
+                OperationTime.push_back(query.value(3).toTime());
+                VisitDate.push_back(query.value(4).toDate());
+                VisitStartTime.push_back(query.value(5).toTime());
+                VisitTime.push_back(query.value(6).toTime());
+            }
+            qDebug() << OperationStartDay;
+            qDebug() << OperationStartTime;
+            qDebug() << OperationTime;
+            qDebug() << VisitDate;
+            qDebug() << VisitStartTime;
+            qDebug() << VisitTime;
+            qDebug() << "VisitNewDate =" << VisitNewDate;
+            qDebug() << "VisitNewEndTime =" << VisitNewEndTime;
+            for (int i = 0; i < OperationStartTime.size(); i++) {
+                OperationEndTime.push_back(OperationStartTime.at(i).addSecs(OperationTime.at(i).second() + OperationTime.at(i).minute() * 60 + OperationTime.at(i).hour() * 60 * 60));
+            }
+            for (int i = 0; i < VisitStartTime.size(); i++) {
+                VisitEndTime.push_back(VisitStartTime.at(i).addSecs(VisitTime.at(i).second() + VisitTime.at(i).minute() * 60 + VisitTime.at(i).hour() * 60 * 60));
+            }
+            qDebug() << "OperationEndTime =" << OperationEndTime;
+            qDebug() << "VisitEndTime =" << VisitEndTime;
+
+            bool medIsBusy = false;
+
+            long int VisitNewStartTimeSeconds = VisitNewStartTime.hour() * 60 * 60 + VisitNewStartTime.minute() * 60 + VisitNewStartTime.second();
+            long int VisitNewEndTimeSeconds = VisitNewEndTime.hour() * 60 * 60 + VisitNewEndTime.minute() * 60 + VisitNewEndTime.second();
+
+            QVector<long int> VisitStartTimeSeconds;
+            QVector<long int> VisitEndTimeSeconds;
+            QVector<long int> OperationStartTimeSeconds;
+            QVector<long int> OperationEndTimeSeconds;
+
+            for (int i = 0; i < VisitStartTime.size(); i++) {
+                VisitStartTimeSeconds.push_back(VisitStartTime.at(i).hour() * 60 * 60 + VisitStartTime.at(i).minute() * 60 + VisitStartTime.at(i).second());
+            }
+            for (int i = 0; i < VisitEndTime.size(); i++) {
+                VisitEndTimeSeconds.push_back(VisitEndTime.at(i).hour() * 60 * 60 + VisitEndTime.at(i).minute() * 60 + VisitEndTime.at(i).second());
+            }
+            for (int i = 0; i < OperationStartTime.size(); i++) {
+                OperationStartTimeSeconds.push_back(OperationStartTime.at(i).hour() * 60 * 60 + OperationStartTime.at(i).minute() * 60 + OperationStartTime.at(i).second());
+            }
+            for (int i = 0; i < OperationEndTime.size(); i++) {
+                OperationEndTimeSeconds.push_back(OperationEndTime.at(i).hour() * 60 * 60 + OperationEndTime.at(i).minute() * 60 + OperationEndTime.at(i).second());
+            }
+
+            for (int i = 0; i < OperationStartDay.size(); i++) {
+                if (!medIsBusy) {
+                    if ((VisitNewDate == OperationStartDay.at(i)) || (VisitNewDate == VisitDate.at(i))) {
+                        qDebug() << "В этот день у врача что-то есть";
+                        if (!medIsBusy) {
+                            for (int i = 0; i < OperationTime.size(); i++) {
+                                if (!medIsBusy) {
+                                    if ((VisitNewEndTimeSeconds <= VisitStartTimeSeconds.at(i) || VisitNewStartTimeSeconds >= VisitEndTimeSeconds.at(i)) &&
+                                            (VisitNewEndTimeSeconds <= OperationStartTimeSeconds.at(i) || VisitNewStartTimeSeconds >= OperationEndTimeSeconds.at(i))) {
+
+                                    } else {
+                                        medIsBusy = true;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        qDebug() << "В этот день врач свободен";
+                    }
+                }
+            }
+
+            if (!medIsBusy) {
+                query.prepare("INSERT INTO Посещение (НомерПосещения, НомерПациента, НомерВрача, ДатаПосещения, ВремяПосещения, Жалоба, РезультатОбследования, Цена) "
+                                      "VALUES ( :visitNum, :patientNum, :medicNum, :visitDate, :visitTime, :visitReport, :visitResult, :visitPrice )");
+                query.bindValue(":visitNum", visitNum->text().toInt());
+                //query.bindValue(":patientNum", patientNum->text().toInt());
+                //query.bindValue(":medicNum", medicNum->text().toInt());
+                query.bindValue(":patientNum", patientFIO->currentIndex() + 1);
+                query.bindValue(":medicNum", medicFIO->currentIndex() + 1);
+                qDebug() << patientFIO->currentIndex() + 1;
+                qDebug() << medicFIO->currentIndex() + 1;
+                query.bindValue(":visitDate", QDate::fromString(visitDate->text(), "dd.MM.yyyy"));
+                query.bindValue(":visitTime", QTime::fromString(visitTime->text(), "hh.mm.ss"));
+                query.bindValue(":visitReport", visitReport->text());
+                query.bindValue(":visitResult", visitResult->text());
+                query.bindValue(":visitPrice", visitPrice->text().toInt());
+                if (query.exec()) {
+                    formWidget->close();
+                } else {
+                    qDebug() << "Insert error" << query.lastError();
+                }
+            } else {
+                qDebug() << "Medic is busy!";
+                QLabel *medIsBusyLabel = new QLabel();
+                medIsBusyLabel->setText("Врач в это время занят!\n Выберите другое время для посещения");
+                medIsBusyLabel->show();
+            }
+
         } else {
-            qDebug() << "Insert error" << query.lastError();
+            qDebug() << "Procedure is not executed properly";
         }
     } else {
         qDebug() << "Заполнены не все поля!";
@@ -664,35 +772,19 @@ void MainWindow::on_medicGraphic_triggered()
 void MainWindow::watchMedicWorkloadConfirmButtonClicked() {
     QSqlQuery query;
 
-    /*query.prepare("CREATE TABLE `Hospital`.`TempTable` ( `НомерОперации` INT NOT NULL , `НомерТипаОперации` INT NOT NULL , `НомерИсторииБолезни` INT NOT NULL , "
-                  "`ДатаПроведеннойОперации` DATE NOT NULL , `ВремяНачалаОперации` TIME NOT NULL , "
-                  "PRIMARY KEY (`НомерОперации`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");*/
+    query.prepare("CALL `CreateTableMedicWorkLoad1` (:medNum, :visitTime)");
+    qDebug() << "medicFIO current index is" << medicFIO->currentIndex() + 1;
+    query.bindValue(":medNum", medicFIO->currentIndex() + 1);
+    query.bindValue(":visitTime", QTime::fromString("00:30:00"));
 
     if (query.exec()) {
-        qDebug() << "Table created";
-        query.prepare("SET @MedNum = 2;"
-                      "SET @VisitTime = '00:30:00';"
-                      "INSERT INTO TempTable"
-                      "SELECT a.НомерОперации, a.ДатаПроведенияОперации, a.ВремяНачалаОперации, b.ВремяПроведения, c.ДатаПосещения, c.ВремяПосещения, @VisitTime FROM Операции a join ТипОперации b on a.НомерТипаОперации = b.НомерОперации join Посещение c ON a.НомерВрача = c.НомерВрача"
-                      "where a.НомерИсторииБолезни in"
-                      "(SELECT НомерЗаписи from ИсторияБолезни"
-                      "where НомерПосещения in"
-                      "(SELECT НомерПосещения from Посещение where НомерВрача = @MedNum))");
-        if (query.exec()) {
-            qDebug() << "Values inserted";
-        } else {
-            qDebug() << "Values not inserted";
-        }
-    } else {
-        qDebug() << "Table not created";
+        query.prepare("SELECT * FROM TempTable");
+        query.exec();
+        QSqlTableModel *model = new QSqlTableModel(this, db);
+        model->setTable("TempTable");
+        model->select();
+        QTableView *view = new QTableView;
+        view->setModel(model);
+        view->show();
     }
-
-
-    QSqlTableModel *model = new QSqlTableModel(this, db);
-    model->setTable("TempTable");
-    model->select();
-    QTableView *view = new QTableView;
-    view->setModel(model);
-    view->show();
-
 }

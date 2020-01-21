@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:3306
--- Время создания: Янв 21 2020 г., 07:05
+-- Время создания: Янв 21 2020 г., 22:53
 -- Версия сервера: 5.7.28-0ubuntu0.19.04.2
 -- Версия PHP: 7.2.24-0ubuntu0.19.04.2
 
@@ -26,6 +26,13 @@ DELIMITER $$
 --
 CREATE DEFINER=`bitas0709`@`%` PROCEDURE `CreateTableMedicWorkLoad` ()  NO SQL
 CREATE TABLE `Hospital`.`TempTable` ( `НомерОперации` INT NOT NULL, `ДатаПроведенияОперации` DATE NOT NULL, `ВремяНачалаОперации` TIME NOT NULL, `ВремяПроведенияОперации` TIME NOT NULL, `ДатаПосещения` DATE NOT NULL, `ВремяНачалаПосещения` TIME NOT NULL, `ВремяПосещения` TIME NOT NULL) ENGINE = INNODB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci$$
+
+CREATE DEFINER=`bitas0709`@`%` PROCEDURE `CreateTableMedicWorkLoad1` (IN `MedNum` INT, IN `VisitTime` TIME)  NO SQL
+BEGIN
+DROP TABLE IF EXISTS `Hospital`.`TempTable`;
+CREATE TABLE `Hospital`.`TempTable` ( `НомерОперации` INT, `ДатаПроведенияОперации` DATE, `ВремяНачалаОперации` TIME, `ВремяПроведенияОперации` TIME, `ДатаПосещения` DATE, `ВремяНачалаПосещения` TIME, `ВремяПосещения` TIME);
+CALL `Hospital`.`FillTableMedicWorkLoad` (MedNum, VisitTime);
+END$$
 
 CREATE DEFINER=`bitas0709`@`%` PROCEDURE `FillTableMedicWorkLoad` (IN `MedNum` INT, IN `VisitTime` TIME)  NO SQL
 INSERT INTO TempTable
@@ -55,13 +62,13 @@ DELIMITER ;
 --
 
 CREATE TABLE `TempTable` (
-  `НомерОперации` int(11) NOT NULL,
-  `ДатаПроведенияОперации` date NOT NULL,
-  `ВремяНачалаОперации` time NOT NULL,
-  `ВремяПроведенияОперации` time NOT NULL,
-  `ДатаПосещения` date NOT NULL,
-  `ВремяНачалаПосещения` time NOT NULL,
-  `ВремяПосещения` time NOT NULL
+  `НомерОперации` int(11) DEFAULT NULL,
+  `ДатаПроведенияОперации` date DEFAULT NULL,
+  `ВремяНачалаОперации` time DEFAULT NULL,
+  `ВремяПроведенияОперации` time DEFAULT NULL,
+  `ДатаПосещения` date DEFAULT NULL,
+  `ВремяНачалаПосещения` time DEFAULT NULL,
+  `ВремяПосещения` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -179,7 +186,9 @@ INSERT INTO `Пациенты` (`НомерПациента`, `Фамилия`, 
 (5, 'Рыжикова', 'Светлана', 'Олеговна', 'Женский', '1962-03-01', 'мкр. Парковый, д. 1', 57625786, '75НА284757', '9543235891'),
 (6, 'Уваров', 'Альберт', 'Алексеевич', 'Мужской', '1996-01-22', 'ул. Молодогвардеец, д. 4', 47261263, '56АМ574612', ''),
 (7, 'Халапян', 'Георгий', 'Александрович', 'Мужской', '1997-09-02', 'ул. Матросова, д.6', 74621823, '28НА741231', '9231238712'),
-(8, 'Иванов', 'Сергей', 'Федорович', 'Мужской', '1962-09-21', 'ул. Приборостроителей, д.2', 47562162, '57ЙФ462172', '9421234212');
+(8, 'Иванов', 'Сергей', 'Федорович', 'Мужской', '1962-09-21', 'ул. Приборостроителей, д.2', 47562162, '57ЙФ462172', '9421234212'),
+(9, 'Картавцева', 'Ирина', 'Викторовна', 'Женский', '1996-10-01', 'Адрес', 9541086, '15АУ576281', '9057655621'),
+(10, 'Купаев', 'Алексей', 'Сергеевич', 'Мужской', '1967-02-16', 'ул. Матросова, д. 5', 57682134, '87АМ856851', '9602485165');
 
 -- --------------------------------------------------------
 

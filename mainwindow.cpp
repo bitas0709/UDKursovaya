@@ -270,6 +270,7 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
     formWidget = new QWidget();
     QFormLayout form(formWidget);
     operationNum = new QLineEdit(formWidget);
+    medicFIO = new QComboBox(formWidget);
     operationTypeNum = new QLineEdit(formWidget);
     diseaseHistoryNum = new QLineEdit(formWidget);
     operationDate = new QLineEdit(formWidget);
@@ -282,6 +283,11 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
         maxNum = query.value(0).toInt();
         maxNum += 1;
     }
+    query.prepare("SELECT CONCAT(Фамилия, ' ', Имя, ' ', Отчество) FROM Врачи");
+    query.exec();
+    while(query.next()) {
+        medicFIO->addItem(query.value(0).toString());
+    }
     operationNum->setText(QString::number(maxNum));
     QPushButton *confirmButton = new QPushButton(formWidget);
     connect(confirmButton, SIGNAL(clicked()), SLOT(writePatientOnOperationFormConfirmButtonClicked()));
@@ -291,6 +297,7 @@ void MainWindow::on_writePatientOnOperationForm_triggered()
     form.addRow(new QLabel("Номер записи:"), operationNum);
     form.addRow(new QLabel("Номер типа операции:"), operationTypeNum);
     form.addRow(new QLabel("Номер записи в истории болезней:"), diseaseHistoryNum);
+    form.addRow(new QLabel("Врач:"), medicFIO);
     form.addRow(new QLabel("Дата проведения операции:"), operationDate);
     form.addRow(new QLabel("Время начала операции:"), operationStartTime);
     form.addRow(confirmButton, cancelButton);
@@ -309,6 +316,7 @@ void MainWindow::writePatientOnOperationFormConfirmButtonClicked() {
         query.bindValue(":operationNum", operationNum->text().toInt());
         query.bindValue(":operationTypeNum", operationTypeNum->text().toInt());
         query.bindValue(":diseaseHistoryNum", diseaseHistoryNum->text().toInt());
+        query.bindValue(":medicNum", medicFIO->currentIndex() + 1);
         query.bindValue(":operationDate", QDate::fromString(operationDate->text(), "dd.MM.yyyy"));
         query.bindValue(":operationStartTime", QTime::fromString(operationStartTime->text(), "hh.mm.ss"));
         if (query.exec()) {
@@ -662,7 +670,19 @@ void MainWindow::watchMedicWorkloadConfirmButtonClicked() {
 
     if (query.exec()) {
         qDebug() << "Table created";
-        query.prepare("");
+        query.prepare("SET @MedNum = 2;"
+                      "SET @VisitTime = '00:30:00';"
+                      "INSERT INTO TempTable"
+                      "SELECT a.НомерОперации, a.ДатаПроведенияОперации, a.ВремяНачалаОперации, b.ВремяПроведения, c.ДатаПосещения, c.ВремяПосещения, @VisitTime FROM Операции a join ТипОперации b on a.НомерТипаОперации = b.НомерОперации join Посещение c ON a.НомерВрача = c.НомерВрача"
+                      "where a.НомерИсторииБолезни in"
+                      "(SELECT НомерЗаписи from ИсторияБолезни"
+                      "where НомерПосещения in"
+                      "(SELECT НомерПосещения from Посещение where НомерВрача = @MedNum))");
+        if (query.exec()) {
+            qDebug() << "Values inserted";
+        } else {
+            qDebug() << "Values not inserted";
+        }
     } else {
         qDebug() << "Table not created";
     }

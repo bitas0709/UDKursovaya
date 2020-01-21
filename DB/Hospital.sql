@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:3306
--- Время создания: Янв 19 2020 г., 16:33
+-- Время создания: Янв 21 2020 г., 07:05
 -- Версия сервера: 5.7.28-0ubuntu0.19.04.2
 -- Версия PHP: 7.2.24-0ubuntu0.19.04.2
 
@@ -24,6 +24,17 @@ DELIMITER $$
 --
 -- Процедуры
 --
+CREATE DEFINER=`bitas0709`@`%` PROCEDURE `CreateTableMedicWorkLoad` ()  NO SQL
+CREATE TABLE `Hospital`.`TempTable` ( `НомерОперации` INT NOT NULL, `ДатаПроведенияОперации` DATE NOT NULL, `ВремяНачалаОперации` TIME NOT NULL, `ВремяПроведенияОперации` TIME NOT NULL, `ДатаПосещения` DATE NOT NULL, `ВремяНачалаПосещения` TIME NOT NULL, `ВремяПосещения` TIME NOT NULL) ENGINE = INNODB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci$$
+
+CREATE DEFINER=`bitas0709`@`%` PROCEDURE `FillTableMedicWorkLoad` (IN `MedNum` INT, IN `VisitTime` TIME)  NO SQL
+INSERT INTO TempTable
+SELECT a.НомерОперации, a.ДатаПроведенияОперации, a.ВремяНачалаОперации, b.ВремяПроведения, c.ДатаПосещения, c.ВремяПосещения, VisitTime FROM Операции a join ТипОперации b on a.НомерТипаОперации = b.НомерОперации join Посещение c ON a.НомерВрача = c.НомерВрача
+where a.НомерИсторииБолезни in
+(SELECT НомерЗаписи from ИсторияБолезни
+where НомерПосещения in
+(SELECT НомерПосещения from Посещение where НомерВрача = MedNum))$$
+
 CREATE DEFINER=`bitas0709`@`%` PROCEDURE `WatchMedicsCard` ()  NO SQL
 SELECT a.НомерВрача, a.Фамилия, a.Имя, a.Отчество, a.ДатаНайма, b.Профессия, a.НомерТелефона
 FROM Врачи a join ПрофессииВрача b
@@ -36,6 +47,30 @@ WHERE a.НомерПрофессии = b.НомерПрофессии
 #set MedNum = a.НомерВрача#set LastName = a.Фамилия#set FirstName = a.Имя#set HireDate = a.ДатаНайма#set Profession = b.Профессия#set MobileNum = a.НомерТелефона$$
 
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `TempTable`
+--
+
+CREATE TABLE `TempTable` (
+  `НомерОперации` int(11) NOT NULL,
+  `ДатаПроведенияОперации` date NOT NULL,
+  `ВремяНачалаОперации` time NOT NULL,
+  `ВремяПроведенияОперации` time NOT NULL,
+  `ДатаПосещения` date NOT NULL,
+  `ВремяНачалаПосещения` time NOT NULL,
+  `ВремяПосещения` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `TempTable`
+--
+
+INSERT INTO `TempTable` (`НомерОперации`, `ДатаПроведенияОперации`, `ВремяНачалаОперации`, `ВремяПроведенияОперации`, `ДатаПосещения`, `ВремяНачалаПосещения`, `ВремяПосещения`) VALUES
+(1, '2019-05-20', '16:30:00', '00:30:00', '2019-05-12', '12:00:00', '00:30:00'),
+(1, '2019-05-20', '16:30:00', '00:30:00', '2019-07-16', '12:00:00', '00:30:00');
 
 -- --------------------------------------------------------
 
@@ -98,6 +133,7 @@ CREATE TABLE `Операции` (
   `НомерОперации` int(11) NOT NULL,
   `НомерТипаОперации` int(11) NOT NULL,
   `НомерИсторииБолезни` int(11) NOT NULL,
+  `НомерВрача` int(11) NOT NULL,
   `ДатаПроведенияОперации` date NOT NULL,
   `ВремяНачалаОперации` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -106,11 +142,11 @@ CREATE TABLE `Операции` (
 -- Дамп данных таблицы `Операции`
 --
 
-INSERT INTO `Операции` (`НомерОперации`, `НомерТипаОперации`, `НомерИсторииБолезни`, `ДатаПроведенияОперации`, `ВремяНачалаОперации`) VALUES
-(1, 1, 1, '2019-05-20', '16:30:00'),
-(2, 3, 2, '2019-05-18', '12:30:00'),
-(3, 4, 3, '2019-05-25', '14:00:00'),
-(4, 2, 4, '2019-12-23', '16:00:00');
+INSERT INTO `Операции` (`НомерОперации`, `НомерТипаОперации`, `НомерИсторииБолезни`, `НомерВрача`, `ДатаПроведенияОперации`, `ВремяНачалаОперации`) VALUES
+(1, 1, 1, 2, '2019-05-20', '16:30:00'),
+(2, 3, 2, 1, '2019-05-18', '12:30:00'),
+(3, 4, 3, 3, '2019-05-25', '14:00:00'),
+(4, 2, 4, 2, '2019-12-23', '16:00:00');
 
 -- --------------------------------------------------------
 
@@ -277,7 +313,8 @@ ALTER TABLE `ИсторияБолезни`
 ALTER TABLE `Операции`
   ADD PRIMARY KEY (`НомерОперации`),
   ADD KEY `Operation_ifbk_1` (`НомерТипаОперации`),
-  ADD KEY `Operation_ifbk_2` (`НомерИсторииБолезни`);
+  ADD KEY `Operation_ifbk_2` (`НомерИсторииБолезни`),
+  ADD KEY `Operation_ifbk_3` (`НомерВрача`);
 
 --
 -- Индексы таблицы `Пациенты`
@@ -333,7 +370,8 @@ ALTER TABLE `ИсторияБолезни`
 --
 ALTER TABLE `Операции`
   ADD CONSTRAINT `Operation_ifbk_1` FOREIGN KEY (`НомерТипаОперации`) REFERENCES `ТипОперации` (`НомерОперации`),
-  ADD CONSTRAINT `Operation_ifbk_2` FOREIGN KEY (`НомерИсторииБолезни`) REFERENCES `ИсторияБолезни` (`НомерЗаписи`);
+  ADD CONSTRAINT `Operation_ifbk_2` FOREIGN KEY (`НомерИсторииБолезни`) REFERENCES `ИсторияБолезни` (`НомерЗаписи`),
+  ADD CONSTRAINT `Operation_ifbk_3` FOREIGN KEY (`НомерВрача`) REFERENCES `Врачи` (`НомерВрача`);
 
 --
 -- Ограничения внешнего ключа таблицы `Посещение`
